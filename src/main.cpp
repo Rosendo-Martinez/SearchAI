@@ -1,7 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <iostream>
+
+#include "Shader.h"
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
@@ -17,6 +18,10 @@ int main()
     {
         return -1;
     }
+
+    // Shader shader;
+    // shader.compile("./shaders/square.vs", "./shaders/square.fs");
+    // shader.use();
 
     while (!glfwWindowShouldClose(window))
     {
