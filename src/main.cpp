@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Shader.h"
+#include "SquareRenderer.h"
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
@@ -19,9 +20,10 @@ int main()
         return -1;
     }
 
-    // Shader shader;
-    // shader.compile("./shaders/square.vs", "./shaders/square.fs");
-    // shader.use();
+    // Shader, and renderer
+    Shader shader;
+    shader.compile("./shaders/square.vs", "./shaders/square.fs");
+    SquareRenderer renderer(shader);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -29,6 +31,8 @@ int main()
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        renderer.draw(0.7, 0.1, 0.2);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

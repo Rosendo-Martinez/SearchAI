@@ -1,0 +1,47 @@
+#include <glad/glad.h>
+#include "SquareRenderer.h"
+
+SquareRenderer::SquareRenderer(Shader shader)
+{
+    // square
+    const float vertices[] = {
+        -0.5f,  0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+         0.5f,  0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+         0.5f,  0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f
+    };
+
+    // Generate IDs
+    unsigned int VBO, VAO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    // Copy data to buffer
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    this->VAO = VAO;
+    this->shader = shader;
+}
+
+void SquareRenderer::draw(float r, float g, float b)
+{
+    // Bind shader, and set uniforms
+    this->shader.use();
+    this->shader.setVector("color", r, g, b);
+
+    // Draw square
+    glBindVertexArray(this->VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Unbind VAO, and shader
+    glBindVertexArray(0);
+    glUseProgram(0);
+}

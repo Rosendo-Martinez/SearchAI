@@ -92,3 +92,8 @@ void Shader::use()
 {
     glUseProgram(this->ID);
 }
+
+void Shader::setVector(const char* name, float x, float y, float z)
+{
+    glUniform3f(glGetUniformLocation(this->ID, name), x, y, z);
+}
