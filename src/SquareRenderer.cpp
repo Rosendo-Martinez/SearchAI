@@ -45,3 +45,24 @@ void SquareRenderer::draw(float r, float g, float b)
     glBindVertexArray(0);
     glUseProgram(0);
 }
+
+void SquareRenderer::draw(const glm::vec3& color, const glm::vec3& translate, const glm::vec2& scale)
+{
+    // Create model matrix
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, translate);
+    model = glm::scale(model, glm::vec3(scale, 1.0));
+
+    // Set uniforms
+    this->shader.use();
+    this->shader.setVector("color", color);
+    this->shader.setMat4("model", model);
+
+    // Draw square
+    glBindVertexArray(this->VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Unbind VAO, and shader
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
