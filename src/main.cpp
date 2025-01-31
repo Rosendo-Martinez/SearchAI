@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Shader.h"
 #include "SquareRenderer.h"
@@ -12,8 +14,8 @@ int main()
 {
     // Window
     GLFWwindow* window = nullptr;
-    const unsigned int SCR_WIDTH = 1280;
-    const unsigned int SCR_HEIGHT = 720;
+    const unsigned int SCR_WIDTH = 800;
+    const unsigned int SCR_HEIGHT = 800;
 
     if (!initialize(window, SCR_WIDTH, SCR_HEIGHT))
     {
@@ -24,6 +26,20 @@ int main()
     Shader shader;
     shader.compile("./shaders/square.vs", "./shaders/square.fs");
     SquareRenderer renderer(shader);
+
+    struct ProjectionConfig
+    {
+        float top = 800.0f;
+        float bottom = 0.0f;
+        float left = 0.0f;
+        float right = 800.0f;
+        float near = 1.0f;
+        float far = -1.0f;
+    } projConfig;
+
+    glm::mat4 projection = glm::ortho(projConfig.left, projConfig.right, projConfig.bottom, projConfig.top, projConfig.near, projConfig.far);
+    shader.use();
+    shader.setMat4("projection", projection);
 
     while (!glfwWindowShouldClose(window))
     {
