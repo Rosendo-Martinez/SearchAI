@@ -6,6 +6,7 @@
 
 #include "Shader.h"
 #include "SquareRenderer.h"
+#include "Grid.h"
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
@@ -40,6 +41,22 @@ int main()
     glm::mat4 projection = glm::ortho(projConfig.left, projConfig.right, projConfig.bottom, projConfig.top, projConfig.near, projConfig.far);
     shader.use();
     shader.setMat4("projection", projection);
+
+    // just log out the result for now
+    Grid grid(2,2);
+
+    /**
+     * 0 1
+     * 1 0
+     */
+    grid.set(0, 0, 0);
+    grid.set(0, 1, 1);
+    grid.set(1, 0, 1);
+    grid.set(1, 1, 0);
+
+    std::cout << "Grid:\n";
+    std::cout << grid.get(0,0) << ' ' << grid.get(0,1) << '\n';
+    std::cout << grid.get(1,0) << ' ' << grid.get(1,1) << '\n';
 
     while (!glfwWindowShouldClose(window))
     {
