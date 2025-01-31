@@ -53,7 +53,6 @@ int main()
         glm::vec2 scale = glm::vec2(400.f);
 
         renderer.draw(color, translate, scale);
-        // renderer.draw(0.7, 0.1, 0.2);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

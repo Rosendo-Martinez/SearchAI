@@ -5,7 +5,7 @@ run : ./bin/main.exe
 	./bin/main.exe
 
 clean : 
-	rm ./bin/main.exe
+	rm ./bin/main.exe ./bin/*.o
 
 ./bin/Shader.o : ./src/Shader.cpp ./src/Shader.h
 	g++ -c ./src/Shader.cpp -o ./bin/Shader.o -I./dep/glad/include
