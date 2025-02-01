@@ -8,6 +8,7 @@
 #include "SquareRenderer.h"
 #include "Grid.h"
 #include "GridRawData.h"
+#include "LineRenderer.h"
 
 const glm::vec3 CELL_COLORS[] = 
 {
@@ -37,6 +38,10 @@ int main()
     shader.compile("./shaders/square.vs", "./shaders/square.fs");
     SquareRenderer renderer(shader);
 
+    Shader lineShader;
+    lineShader.compile("./shaders/line.vs", "./shaders/line.fs");
+    LineRenderer lineRenderer(lineShader);
+
     struct ProjectionConfig
     {
         float top = 800.0f;
@@ -50,6 +55,8 @@ int main()
     glm::mat4 projection = glm::ortho(projConfig.left, projConfig.right, projConfig.bottom, projConfig.top, projConfig.near, projConfig.far);
     shader.use();
     shader.setMat4("projection", projection);
+    lineShader.use();
+    lineShader.setMat4("projection", projection);
 
     initializeGridData();
     Grid grid(gridData->rows, gridData->cols);
@@ -63,6 +70,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
+        lineRenderer.draw(glm::vec3(0.1, 0.0, 1.0), glm::vec2(0.0f, 0.0f), glm::vec2(SCR_WIDTH, SCR_HEIGHT));
 
         glfwSwapBuffers(window);
         glfwPollEvents();

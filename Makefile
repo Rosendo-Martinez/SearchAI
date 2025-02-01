@@ -1,5 +1,5 @@
-./bin/main.exe : ./src/main.cpp ./bin/Shader.o ./bin/SquareRenderer.o ./bin/Grid.o ./src/GridRawData.h
-	g++ -o ./bin/main.exe ./src/main.cpp ./dep/glad/src/glad.c ./bin/Shader.o ./bin/SquareRenderer.o ./bin/Grid.o -I./dep/glad/include -lglfw -ldl
+./bin/main.exe : ./src/main.cpp ./bin/Shader.o ./bin/SquareRenderer.o ./bin/Grid.o ./src/GridRawData.h ./bin/LineRenderer.o
+	g++ -o ./bin/main.exe ./src/main.cpp ./dep/glad/src/glad.c ./bin/Shader.o ./bin/SquareRenderer.o ./bin/Grid.o ./bin/LineRenderer.o -I./dep/glad/include -lglfw -ldl
 
 run : ./bin/main.exe
 	./bin/main.exe
@@ -15,3 +15,6 @@ clean :
 
 ./bin/Grid.o : ./src/Grid.cpp ./src/Grid.h
 	g++ -c ./src/Grid.cpp -o ./bin/Grid.o
+
+./bin/LineRenderer.o : ./src/LineRenderer.cpp ./src/LineRenderer.h
+	g++ -c ./src/LineRenderer.cpp -o ./bin/LineRenderer.o -I./dep/glad/include
