@@ -10,6 +10,7 @@
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
+void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
 
 int main()
 {
@@ -42,21 +43,15 @@ int main()
     shader.use();
     shader.setMat4("projection", projection);
 
-    // just log out the result for now
-    Grid grid(2,2);
-
     /**
      * 0 1
      * 1 0
      */
+    Grid grid(2,2);
     grid.set(0, 0, 0);
     grid.set(0, 1, 1);
     grid.set(1, 0, 1);
     grid.set(1, 1, 0);
-
-    std::cout << "Grid:\n";
-    std::cout << grid.get(0,0) << ' ' << grid.get(0,1) << '\n';
-    std::cout << grid.get(1,0) << ' ' << grid.get(1,1) << '\n';
 
     while (!glfwWindowShouldClose(window))
     {
@@ -65,11 +60,7 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glm::vec3 color = glm::vec3(0.7f, 0.1f, 0.2f);
-        glm::vec3 translate = glm::vec3(400.f, 400.f, 0.0f);
-        glm::vec2 scale = glm::vec2(400.f);
-
-        renderer.draw(color, translate, scale);
+        drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -114,4 +105,31 @@ bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height)
     glViewport(0, 0, width, height);
 
     return true;
+}
+
+void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight)
+{
+    const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
+    const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
+
+    for (unsigned int row = 0; row < grid.getNumberOfRows(); row++)
+    {
+        for (unsigned int col = 0; col < grid.getNumberOfColumns(); col++)
+        {
+            float xTranslation = ((float) col) * cellWidth;
+            float yTranslation = ((float) ((grid.getNumberOfRows() - 1) - row)) * cellHeight;
+
+            glm::vec3 color;
+            if (grid.get(row, col) == 0)
+            {
+                color = glm::vec3(1.0f);
+            } // == 1
+            else
+            {
+                color = glm::vec3(0.0f);
+            }
+
+            renderer.draw(color, glm::vec3(xTranslation, yTranslation, 0.0f), glm::vec2(cellWidth, cellHeight));
+        }
+    }
 }

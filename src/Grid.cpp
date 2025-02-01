@@ -1,6 +1,7 @@
 #include "Grid.h"
 
 Grid::Grid(unsigned int numberOfRows, unsigned int numberOfColumns)
+    : rows(numberOfRows), columns(numberOfColumns)
 {
     // Create 2D array
     this->grid = new unsigned int*[numberOfRows];
@@ -19,7 +20,7 @@ Grid::~Grid()
 /**
  * Gets the value at row i and column j;
  */
-unsigned int Grid::get(unsigned int i, unsigned int j)
+unsigned int Grid::get(unsigned int i, unsigned int j) const
 {
     return this->grid[i][j];
 }
@@ -30,4 +31,14 @@ unsigned int Grid::get(unsigned int i, unsigned int j)
 void Grid::set(unsigned int i, unsigned int j, unsigned int newValue)
 {
     this->grid[i][j] = newValue;
+}
+
+unsigned int Grid::getNumberOfRows() const
+{
+    return this->rows;
+}
+
+unsigned int Grid::getNumberOfColumns() const
+{
+    return this->columns;
 }
