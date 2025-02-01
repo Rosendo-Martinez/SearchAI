@@ -201,7 +201,7 @@ GridCell getCellThatMouseIsOn(Grid& grid,const glm::vec2& mousePos, float gridWi
 
     GridCell cell;
     cell.row = std::floor(mousePos.y / cellHeight);
-    cell.col = std::floor(mousePos.x / gridWidth);
+    cell.col = std::floor(mousePos.x / cellWidth);
 
     return cell;
 }
