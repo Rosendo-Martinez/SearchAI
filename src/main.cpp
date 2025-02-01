@@ -8,6 +8,12 @@
 #include "SquareRenderer.h"
 #include "Grid.h"
 
+const glm::vec3 CELL_COLORS[] = 
+{
+    glm::vec3(0.5f, 0.2f, 0.0f), // 0
+    glm::vec3(0.0f, 0.5f, 0.2f)  // 1 
+};
+
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
@@ -118,16 +124,7 @@ void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float
         {
             float xTranslation = ((float) col) * cellWidth;
             float yTranslation = ((float) ((grid.getNumberOfRows() - 1) - row)) * cellHeight;
-
-            glm::vec3 color;
-            if (grid.get(row, col) == 0)
-            {
-                color = glm::vec3(1.0f);
-            } // == 1
-            else
-            {
-                color = glm::vec3(0.0f);
-            }
+            glm::vec3 color = CELL_COLORS[grid.get(row,col)];
 
             renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
         }
