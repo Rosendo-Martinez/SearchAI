@@ -3,6 +3,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
 
 #include "Shader.h"
 #include "SquareRenderer.h"
@@ -16,11 +17,22 @@ const glm::vec3 CELL_COLORS[] =
     glm::vec3(1.0f)  // 1 
 };
 
+struct GridCell
+{
+    unsigned int row;
+    unsigned int col;
+};
+
+glm::vec2 mousePos;
+
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
 void drawGridLines(const Grid& grid, LineRenderer& renderer, float gridWidth, float gridHeight);
 void loadGrid(Grid& grid, const char* rawData);
+GridCell getCellThatMouseIsOn(Grid& grid,const glm::vec2& mousePos, float gridWidth, float gridHeight);
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer);
 
 int main()
 {
@@ -33,6 +45,7 @@ int main()
     {
         return -1;
     }
+    glfwSetCursorPosCallback(window, cursor_position_callback);
 
     // Shader, and renderer
     Shader shader;
@@ -72,6 +85,9 @@ int main()
 
         drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
         drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
+
+        GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
+        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -176,4 +192,32 @@ void loadGrid(Grid& grid, const char* rawData)
             i += 2;
         }
     }
+}
+
+GridCell getCellThatMouseIsOn(Grid& grid,const glm::vec2& mousePos, float gridWidth, float gridHeight)
+{
+    const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
+    const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
+
+    GridCell cell;
+    cell.row = std::floor(mousePos.y / cellHeight);
+    cell.col = std::floor(mousePos.x / gridWidth);
+
+    return cell;
+}
+
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    mousePos.x = xpos;
+    mousePos.y = ypos;
+}
+
+void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer)
+{
+    const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
+    const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
+    float xTranslation = ((float) cell.col) * cellWidth;
+    float yTranslation = ((float) ((grid.getNumberOfRows() - 1) - cell.row)) * cellHeight;
+
+    renderer.draw(glm::vec3(0.9, 0.01, 0.01), glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
 }
