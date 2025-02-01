@@ -10,13 +10,23 @@
 
 const glm::vec3 CELL_COLORS[] = 
 {
-    glm::vec3(0.5f, 0.2f, 0.0f), // 0
-    glm::vec3(0.0f, 0.5f, 0.2f)  // 1 
+    glm::vec3(0.0f), // 0
+    glm::vec3(1.0f)  // 1 
+};
+
+const unsigned int GRID_1_ROWS = 3;
+const unsigned int GRID_1_COLS = 3;
+const char* GRID_1 = 
+{
+    "0 1 0 "
+    "1 0 1 "
+    "0 1 0 "
 };
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
+void loadGrid(Grid& grid, const char* rawData);
 
 int main()
 {
@@ -49,15 +59,8 @@ int main()
     shader.use();
     shader.setMat4("projection", projection);
 
-    /**
-     * 0 1
-     * 1 0
-     */
-    Grid grid(2,2);
-    grid.set(0, 0, 0);
-    grid.set(0, 1, 1);
-    grid.set(1, 0, 1);
-    grid.set(1, 1, 0);
+    Grid grid(GRID_1_ROWS, GRID_1_COLS);
+    loadGrid(grid, GRID_1);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -127,6 +130,21 @@ void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float
             glm::vec3 color = CELL_COLORS[grid.get(row,col)];
 
             renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
+        }
+    }
+}
+
+void loadGrid(Grid& grid, const char* rawData)
+{
+    unsigned int i = 0;
+    for (unsigned int row = 0; row < grid.getNumberOfRows(); row++)
+    {
+        for (unsigned int col = 0; col < grid.getNumberOfColumns(); col++)
+        {
+            unsigned int value = rawData[i] - '0';
+            grid.set(row, col, value);
+
+            i += 2;
         }
     }
 }
