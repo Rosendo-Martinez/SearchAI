@@ -129,7 +129,7 @@ void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float
                 color = glm::vec3(0.0f);
             }
 
-            renderer.draw(color, glm::vec3(xTranslation, yTranslation, 0.0f), glm::vec2(cellWidth, cellHeight));
+            renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
         }
     }
 }

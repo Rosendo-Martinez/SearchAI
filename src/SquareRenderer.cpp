@@ -31,11 +31,11 @@ SquareRenderer::SquareRenderer(Shader shader)
     this->shader = shader;
 }
 
-void SquareRenderer::draw(const glm::vec3& color, const glm::vec3& translate, const glm::vec2& scale)
+void SquareRenderer::draw(const glm::vec3& color, const glm::vec2& translate, const glm::vec2& scale)
 {
     // Create model matrix
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, translate);
+    model = glm::translate(model, glm::vec3(translate, 1.0f));
     model = glm::scale(model, glm::vec3(scale, 1.0));
 
     // Set uniforms

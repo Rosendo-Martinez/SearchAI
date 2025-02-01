@@ -11,5 +11,5 @@ private:
 public:
     SquareRenderer(Shader shader);
 
-    void draw(const glm::vec3& color, const glm::vec3& translate, const glm::vec2& scale);
+    void draw(const glm::vec3& color, const glm::vec2& translate, const glm::vec2& scale);
 };
