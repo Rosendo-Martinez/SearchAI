@@ -7,20 +7,12 @@
 #include "Shader.h"
 #include "SquareRenderer.h"
 #include "Grid.h"
+#include "GridRawData.h"
 
 const glm::vec3 CELL_COLORS[] = 
 {
     glm::vec3(0.0f), // 0
     glm::vec3(1.0f)  // 1 
-};
-
-const unsigned int GRID_1_ROWS = 3;
-const unsigned int GRID_1_COLS = 3;
-const char* GRID_1 = 
-{
-    "0 1 0 "
-    "1 0 1 "
-    "0 1 0 "
 };
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
@@ -59,8 +51,9 @@ int main()
     shader.use();
     shader.setMat4("projection", projection);
 
-    Grid grid(GRID_1_ROWS, GRID_1_COLS);
-    loadGrid(grid, GRID_1);
+    initializeGridData();
+    Grid grid(gridData->rows, gridData->cols);
+    loadGrid(grid, gridData->rawData);
 
     while (!glfwWindowShouldClose(window))
     {
