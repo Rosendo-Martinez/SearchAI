@@ -19,6 +19,7 @@ const glm::vec3 CELL_COLORS[] =
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
+void drawGridLines(const Grid& grid, LineRenderer& renderer, float gridWidth, float gridHeight);
 void loadGrid(Grid& grid, const char* rawData);
 
 int main()
@@ -70,7 +71,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
-        lineRenderer.draw(glm::vec3(0.1, 0.0, 1.0), glm::vec2(0.0f, 0.0f), glm::vec2(SCR_WIDTH, SCR_HEIGHT));
+        drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -132,6 +133,33 @@ void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float
 
             renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
         }
+    }
+}
+
+void drawGridLines(const Grid& grid, LineRenderer& renderer, float gridWidth, float gridHeight)
+{
+    const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
+    const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
+    const glm::vec3 color (0.1f, 0.01f, 0.9f);
+
+    // Draw horizontal lines
+    for (unsigned int i = 0; i < grid.getNumberOfRows() + 1; i++)
+    {
+        float y = cellHeight * i;
+        glm::vec2 start (0, y);
+        glm::vec2 end   (gridWidth, y);
+
+        renderer.draw(color, start, end);
+    }
+
+    // Draw vertical lines
+    for (unsigned int i = 0; i < grid.getNumberOfColumns() + 1; i++)
+    {
+        float x = cellWidth * i;
+        glm::vec2 start (x, 0);
+        glm::vec2 end   (x, gridHeight);
+
+        renderer.draw(color, start, end);
     }
 }
 
