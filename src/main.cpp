@@ -37,7 +37,7 @@ void loadGrid(Grid& grid, const char* rawData);
 GridCell getCellThatMouseIsOn(Grid& grid,const glm::vec2& mousePos, float gridWidth, float gridHeight);
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer);
+void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer, glm::vec3 color);
 
 int main()
 {
@@ -95,7 +95,12 @@ int main()
         drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
-        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer);
+        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.9, 0.01, 0.01));
+
+        GridCell pathStartCell = getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT);
+        GridCell pathEndCell = getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT);
+        drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.1,0.9,0.01));
+        drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.9, 0.9, 0.01));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -240,13 +245,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer)
+void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer, glm::vec3 color)
 {
     const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
     const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
     float xTranslation = ((float) cell.col) * cellWidth;
     float yTranslation = ((float) ((grid.getNumberOfRows() - 1) - cell.row)) * cellHeight;
 
-    renderer.draw(glm::vec3(0.9, 0.01, 0.01), glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
+    renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
 }
 
