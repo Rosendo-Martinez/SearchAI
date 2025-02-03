@@ -1,5 +1,5 @@
 #include <vector>
-// #include "Grid.h"
+#include "Grid.h"
 
 struct GridCell
 {
@@ -8,3 +8,5 @@ struct GridCell
 };
 
 std::vector<GridCell> search(GridCell start, GridCell end);
+
+std::vector<GridCell> searchBFS(GridCell start, GridCell end, const Grid& grid);

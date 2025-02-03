@@ -7,7 +7,7 @@
 
 #include "Shader.h"
 #include "SquareRenderer.h"
-#include "Grid.h"
+// #include "Grid.h"
 #include "GridRawData.h"
 #include "LineRenderer.h"
 #include "SearchAI.h"
@@ -29,6 +29,7 @@ glm::vec2 mousePos;
 glm::vec2 pathStart;
 glm::vec2 pathEnd;
 bool pathStartSelected = true;
+bool recalculate = false;
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
@@ -85,9 +86,16 @@ int main()
     Grid grid(gridData->rows, gridData->cols);
     loadGrid(grid, gridData->rawData);
 
+    std::vector<GridCell> solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
     while (!glfwWindowShouldClose(window))
     {
-        std::vector<GridCell> solutionPath = search(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
+        // std::vector<GridCell> solutionPath = search(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
+        if (recalculate)
+        {
+            solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
+            recalculate = false;
+        }
+        // std::cout << solutionPath.size() << '\n';
 
         processInput(window);
 
@@ -250,6 +258,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         }
 
         pathStartSelected = !pathStartSelected;
+        recalculate = true;
     }
 }
 
