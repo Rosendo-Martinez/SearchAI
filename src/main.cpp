@@ -10,6 +10,7 @@
 #include "Grid.h"
 #include "GridRawData.h"
 #include "LineRenderer.h"
+#include "SearchAI.h"
 
 const glm::vec3 CELL_COLORS[] = 
 {
@@ -17,11 +18,11 @@ const glm::vec3 CELL_COLORS[] =
     glm::vec3(1.0f)  // 1 
 };
 
-struct GridCell
-{
-    unsigned int row;
-    unsigned int col;
-};
+// struct GridCell
+// {
+//     unsigned int row;
+//     unsigned int col;
+// };
 
 glm::vec2 mousePos;
 
@@ -86,6 +87,8 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        std::vector<GridCell> solutionPath = search(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
+
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -93,6 +96,11 @@ int main()
 
         drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
         drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
+
+        for (auto& cell : solutionPath)
+        {
+            drawCell(cell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.25, 0.25, 0.0));
+        }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
         drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.9, 0.01, 0.01));
