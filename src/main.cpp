@@ -330,7 +330,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
-        animate = !animate;
+        if (ai.done())
+        {
+            reInitAI = true;
+        }
+        else
+        {
+            animate = !animate;
+        }
     }
     if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
     {
