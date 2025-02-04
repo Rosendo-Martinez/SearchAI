@@ -1,6 +1,5 @@
 #include "SearchAI.h"
-#include <queue>
-#include <iostream>
+
 
 // Solution returned backwards.
 std::vector<GridCell> search(GridCell start, GridCell end)
@@ -35,19 +34,6 @@ std::vector<GridCell> search(GridCell start, GridCell end)
         }
     }
 }
-
-struct Node
-{
-    GridCell state;
-    Node* parent;
-};
-
-enum Action
-{
-    // up is -y
-    // right is +x
-    UP, DOWN, LEFT, RIGHT
-};
 
 GridCell doAction(GridCell state, Action act)
 {
@@ -204,4 +190,118 @@ std::vector<GridCell> searchBFS(GridCell start, GridCell end, const Grid& grid)
             open.push(child);
         }
     }
+}
+
+
+void SearchAI::init(GridCell start, GridCell end, Grid* grid)
+{
+    // Free memory
+    for (Node* n : closed)
+    {
+        delete n;
+    }
+    this->closed.clear();
+    while (!open.empty())
+    {
+        Node* n = open.front();
+        open.pop();
+
+        delete n;
+    }
+
+    this->start = start;
+    this->end = end;
+    this->grid = grid;
+    this->foundGoal = false;
+
+    Node* initial = new Node;
+    initial->parent = nullptr;
+    initial->state = start;
+    this->open.push(initial);
+}
+
+void SearchAI::step()
+{
+    if (this->open.empty() || this->foundGoal) // no solution / done
+    {
+        return;
+    }
+
+    Node* n = this->open.front();
+
+    if (n->state.row == this->end.row && n->state.col == this->end.col) // at goal
+    {
+        this->foundGoal = true;
+        return;
+    }
+
+    // Expand node
+    
+    open.pop();
+    closed.push_back(n);
+
+    if (isValidAction(n->state, UP, closed, *this->grid))
+    {
+        Node* child = new Node;
+        child->state = doAction(n->state, UP);
+        child->parent = n;
+        open.push(child);
+    }
+    if (isValidAction(n->state, DOWN, closed, *this->grid))
+    {
+        Node* child = new Node;
+        child->state = doAction(n->state, DOWN);
+        child->parent = n;
+        open.push(child);
+    }
+    if (isValidAction(n->state, LEFT, closed, *this->grid))
+    {
+        Node* child = new Node;
+        child->state = doAction(n->state, LEFT);
+        child->parent = n;
+        open.push(child);
+    }
+    if (isValidAction(n->state, RIGHT, closed, *this->grid))
+    {
+        Node* child = new Node;
+        child->state = doAction(n->state, RIGHT);
+        child->parent = n;
+        open.push(child);
+    }   
+}
+
+std::vector<GridCell> SearchAI::getOpen()
+{
+    std::vector<Node*> copyOfOpen; // Make copy of queue as vector
+    while (!this->open.empty())
+    {
+        copyOfOpen.push_back(this->open.front());
+        this->open.pop();
+    }
+
+
+    std::vector<GridCell> openVec; // Create return list
+    for (Node* n : copyOfOpen)
+    {
+        openVec.push_back(n->state);
+    }
+
+    for (Node* n : copyOfOpen) // Restore queue
+    {
+        this->open.push(n);
+    }
+
+    return openVec;
+}
+
+std::vector<GridCell> SearchAI::getClosed()
+{
+    std::vector<GridCell> toReturn;
+
+    for (Node* n : this->closed)
+    {
+        toReturn.push_back(n->state);
+    }
+
+    return toReturn;
 }

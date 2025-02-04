@@ -31,6 +31,9 @@ glm::vec2 pathEnd;
 bool pathStartSelected = true;
 bool recalculate = false;
 
+bool reInitAI = false;
+SearchAI ai;
+
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
@@ -86,16 +89,22 @@ int main()
     Grid grid(gridData->rows, gridData->cols);
     loadGrid(grid, gridData->rawData);
 
-    std::vector<GridCell> solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
+    // std::vector<GridCell> solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
     while (!glfwWindowShouldClose(window))
     {
         // std::vector<GridCell> solutionPath = search(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
-        if (recalculate)
-        {
-            solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
-            recalculate = false;
-        }
+        // if (recalculate)
+        // {
+        //     // solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
+        //     recalculate = false;
+        // }
         // std::cout << solutionPath.size() << '\n';
+
+        if (reInitAI)
+        {
+            ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid);
+            reInitAI = false;
+        }
 
         processInput(window);
 
@@ -105,9 +114,21 @@ int main()
         drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
         drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
 
-        for (auto& cell : solutionPath)
+        // for (auto& cell : solutionPath)
+        // {
+        //     drawCell(cell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.25, 0.25, 0.0));
+        // }
+
+        std::vector<GridCell> openList = ai.getOpen();
+        for (GridCell c : openList)
         {
-            drawCell(cell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.25, 0.25, 0.0));
+            // std::cout << "By?\n";
+            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.0, 0.0, 1.0));
+        }
+        std::vector<GridCell> closedList = ai.getClosed();
+        for (GridCell c : closedList)
+        {
+            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(1.0, 1.0, 0.0));
         }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
@@ -258,7 +279,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         }
 
         pathStartSelected = !pathStartSelected;
-        recalculate = true;
+        // recalculate = true;
+        reInitAI = true;
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+    {
+        ai.step();
     }
 }
 
