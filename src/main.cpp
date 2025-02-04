@@ -99,7 +99,6 @@ int main()
             std::cout << "AI DONE\n";
             loggedAIFinished = true;
         }
-        // std::cout << usingBFS << '\n';
 
         if (!ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
         {
@@ -160,15 +159,6 @@ void processInput(GLFWwindow *window)
     {
         glfwSetWindowShouldClose(window, true);
     }
-    
-    // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    // {
-    //     // while (!ai.done())
-    //     // {
-    //     //     ai.step();
-    //     // }
-    //     animate = !animate;
-    // }
 }
 
 /**

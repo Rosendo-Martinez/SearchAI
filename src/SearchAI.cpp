@@ -126,9 +126,6 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
 
     // init.
 
-    // std::cout << "Start: " << start.row << ' ' << start.col << '\n';
-    // std::cout << "End: " << end.row << ' ' << end.col << '\n';
-
     this->start = start;
     this->end = end;
     this->grid = grid;
@@ -140,29 +137,19 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
     Node* initial = new Node;
     initial->parent = nullptr;
     initial->state = start;
-
     if (this->usingBFS)
     {
         this->open.push(initial);
-        // std::cout << "init bfs: size: " << this->open.size() << '\n';
     }
     else
     {
         this->openDFS.push(initial);
-        // std::cout << "init dfs: size: " << this->openDFS.size() << '\n';
-    }
-
-    if (!this->usingBFS)
-    {
-        std::cout << "init dfs: size: " << this->openDFS.size() << '\n';
-        std::cout << "foundGoal = " << this->foundGoal << '\n';
-        std::cout << "done() = " << this->done() << '\n';
     }
 }
 
 void SearchAI::step()
 {
-    std::cout << "STEP\n";
+    // std::cout << "STEP\n";
 
     if (this->done()) // no solution / done
     {
@@ -175,7 +162,7 @@ void SearchAI::step()
 
     if (n->state.row == this->end.row && n->state.col == this->end.col) // at goal
     {
-        std::cout << "  At goal\n";
+        // std::cout << "  At goal\n";
         this->foundGoal = true;
         this->goal = n;
         return;
@@ -183,7 +170,6 @@ void SearchAI::step()
 
     // Expand node
     
-    // open.pop();
     if (this->usingBFS)
     {
         open.pop();
@@ -197,7 +183,7 @@ void SearchAI::step()
     const std::vector<GridCell> openList = this->getOpen();
     if (isValidAction(n->state, UP, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Up\n";
+        // std::cout << "  Do Action Up\n";
         Node* child = new Node;
         child->state = doAction(n->state, UP);
         child->parent = n;
@@ -213,7 +199,7 @@ void SearchAI::step()
     }
     if (isValidAction(n->state, DOWN, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Down\n";
+        // std::cout << "  Do Action Down\n";
         Node* child = new Node;
         child->state = doAction(n->state, DOWN);
         child->parent = n;
@@ -229,7 +215,7 @@ void SearchAI::step()
     }
     if (isValidAction(n->state, LEFT, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Left\n";
+        // std::cout << "  Do Action Left\n";
         Node* child = new Node;
         child->state = doAction(n->state, LEFT);
         child->parent = n;
@@ -245,7 +231,7 @@ void SearchAI::step()
     }
     if (isValidAction(n->state, RIGHT, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Right\n";
+        // std::cout << "  Do Action Right\n";
         Node* child = new Node;
         child->state = doAction(n->state, RIGHT);
         child->parent = n;
