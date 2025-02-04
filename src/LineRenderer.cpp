@@ -41,7 +41,7 @@ void LineRenderer::draw(const glm::vec3& color, const glm::vec2& start, const gl
 
     // Draw line
     glBindVertexArray(this->VAO);
-    glLineWidth(2.0f);
+    glLineWidth(1.0f);
     glDrawArrays(GL_LINES, 0, 2);
 
     // Unbind VAO, and program

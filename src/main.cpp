@@ -13,9 +13,14 @@
 
 const glm::vec3 CELL_COLORS[] = 
 {
-    glm::vec3(0.0f), // 0
-    glm::vec3(1.0f)  // 1 
+    glm::vec3(0.2f, 0.329f, 1.0f), // 0
+    glm::vec3(0.259f, 0.988f, 0.008f)  // 1 
 };
+
+const glm::vec3 SOLUTION_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
+const glm::vec3 CLOSED_CELL = glm::vec3(0.725f, 0.024f, 0.035f);
+const glm::vec3 OPEN_CELL = glm::vec3(0.976f, 0.792f, 0.012f);
+const glm::vec3 GRID_LINES_COLOR = glm::vec3(0.1f);
 
 glm::vec2 mousePos;
 
@@ -124,17 +129,17 @@ int main()
         std::vector<GridCell> openList = ai.getOpen();
         for (GridCell c : openList)
         {
-            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.0, 0.0, 1.0));
+            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, OPEN_CELL);
         }
         std::vector<GridCell> closedList = ai.getClosed();
         for (GridCell c : closedList)
         {
-            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.8, 0.1, 0.0));
+            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, CLOSED_CELL);
         }
         std::vector<GridCell> solution = ai.getSolution();
         for (GridCell c : solution)
         {
-            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(1.0, 1.0, 1.0));
+            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
         }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
@@ -142,8 +147,8 @@ int main()
 
         GridCell pathStartCell = getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT);
         GridCell pathEndCell = getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT);
-        drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.1,0.9,0.01));
-        drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.9, 0.9, 0.01));
+        drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+        drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -223,7 +228,7 @@ void drawGridLines(const Grid& grid, LineRenderer& renderer, float gridWidth, fl
         glm::vec2 start (0, y);
         glm::vec2 end   (gridWidth, y);
 
-        renderer.draw(color, start, end);
+        renderer.draw(GRID_LINES_COLOR, start, end);
     }
 
     // Draw vertical lines
@@ -233,7 +238,7 @@ void drawGridLines(const Grid& grid, LineRenderer& renderer, float gridWidth, fl
         glm::vec2 start (x, 0);
         glm::vec2 end   (x, gridHeight);
 
-        renderer.draw(color, start, end);
+        renderer.draw(GRID_LINES_COLOR, start, end);
     }
 }
 
