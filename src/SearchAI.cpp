@@ -101,7 +101,7 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
     return true;
 }
 
-void SearchAI::init(GridCell start, GridCell end, Grid* grid)
+void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
 {
     // Free memory
     for (Node* n : closed)
@@ -116,6 +116,13 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid)
 
         delete n;
     }
+    while (!openDFS.empty())
+    {
+        Node* n = openDFS.top();
+        openDFS.pop();
+
+        delete n;
+    }
 
     // init.
 
@@ -127,29 +134,41 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid)
     this->grid = grid;
     this->foundGoal = false;
     this->goal = nullptr;
+    this->usingBFS = useBFS;
 
     // init. state
     Node* initial = new Node;
     initial->parent = nullptr;
     initial->state = start;
-    this->open.push(initial);
+
+    if (this->usingBFS)
+    {
+        this->open.push(initial);
+        std::cout << "init bfs: size: " << this->open.size() << '\n';
+    }
+    else
+    {
+        this->openDFS.push(initial);
+        std::cout << "init dfs: size: " << this->openDFS.size() << '\n';
+    }
 }
 
 void SearchAI::step()
 {
-    // std::cout << "STEP\n";
+    std::cout << "STEP\n";
 
-    if (this->open.empty() || this->foundGoal) // no solution / done
+    if (this->done()) // no solution / done
     {
         // std::cout << "  Open Empty or Found Goal\n";
         return;
     }
 
-    Node* n = this->open.front();
+    // Node* n = this->open.front();
+    Node* n = this->usingBFS ? this->open.front() : this->openDFS.top();
 
     if (n->state.row == this->end.row && n->state.col == this->end.col) // at goal
     {
-        // std::cout << "  At goal\n";
+        std::cout << "  At goal\n";
         this->foundGoal = true;
         this->goal = n;
         return;
@@ -157,63 +176,125 @@ void SearchAI::step()
 
     // Expand node
     
-    open.pop();
+    // open.pop();
+    if (this->usingBFS)
+    {
+        open.pop();
+    }
+    else 
+    {
+        openDFS.pop();
+    }
     closed.push_back(n);
 
     const std::vector<GridCell> openList = this->getOpen();
     if (isValidAction(n->state, UP, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Up\n";
+        std::cout << "  Do Action Up\n";
         Node* child = new Node;
         child->state = doAction(n->state, UP);
         child->parent = n;
-        open.push(child);
+
+        if (this->usingBFS)
+        {
+            this->open.push(child);
+        }
+        else
+        {
+            this->openDFS.push(child);
+        }
     }
     if (isValidAction(n->state, DOWN, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Down\n";
+        std::cout << "  Do Action Down\n";
         Node* child = new Node;
         child->state = doAction(n->state, DOWN);
         child->parent = n;
-        open.push(child);
+        
+        if (this->usingBFS)
+        {
+            this->open.push(child);
+        }
+        else
+        {
+            this->openDFS.push(child);
+        }
     }
     if (isValidAction(n->state, LEFT, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Left\n";
+        std::cout << "  Do Action Left\n";
         Node* child = new Node;
         child->state = doAction(n->state, LEFT);
         child->parent = n;
-        open.push(child);
+
+        if (this->usingBFS)
+        {
+            this->open.push(child);
+        }
+        else
+        {
+            this->openDFS.push(child);
+        }
     }
     if (isValidAction(n->state, RIGHT, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Right\n";
+        std::cout << "  Do Action Right\n";
         Node* child = new Node;
         child->state = doAction(n->state, RIGHT);
         child->parent = n;
-        open.push(child);
+
+        if (this->usingBFS)
+        {
+            this->open.push(child);
+        }
+        else
+        {
+            this->openDFS.push(child);
+        }
     }   
 }
 
 std::vector<GridCell> SearchAI::getOpen()
 {
-    std::vector<Node*> copyOfOpen; // Make copy of queue
-    while (!this->open.empty())
-    {
-        copyOfOpen.push_back(this->open.front());
-        this->open.pop();
-    }
-
-
     std::vector<GridCell> openVec; // Create list to return
-    for (Node* n : copyOfOpen)
-    {
-        openVec.push_back(n->state);
-    }
 
-    for (Node* n : copyOfOpen) // Restore queue
+    if (this->usingBFS)
     {
-        this->open.push(n);
+        std::vector<Node*> copyOfOpen; // Make copy of queue
+        while (!this->open.empty())
+        {
+            copyOfOpen.push_back(this->open.front());
+            this->open.pop();
+        }
+
+        for (Node* n : copyOfOpen)
+        {
+            openVec.push_back(n->state);
+        }
+
+        for (Node* n : copyOfOpen) // Restore queue
+        {
+            this->open.push(n);
+        }
+    }
+    else
+    {
+        std::vector<Node*> copyOfOpen; // Make copy of stack
+        while (!this->openDFS.empty())
+        {
+            copyOfOpen.push_back(this->openDFS.top());
+            this->openDFS.pop();
+        }
+
+        for (Node* n : copyOfOpen)
+        {
+            openVec.push_back(n->state);
+        }
+
+        for (unsigned int i = copyOfOpen.size() - 1; i > -1; i--) // restore stack
+        {
+            this->openDFS.push(copyOfOpen[i]);
+        }
     }
 
     return openVec;
@@ -253,5 +334,12 @@ std::vector<GridCell> SearchAI::getSolution()
 // true if found goal, else false
 bool SearchAI::done()
 {
-    return foundGoal || this->open.empty();
+    if (this->usingBFS)
+    { 
+        return foundGoal || this->open.empty();
+    }
+    else
+    {
+        return foundGoal || this->openDFS.empty();
+    }
 }

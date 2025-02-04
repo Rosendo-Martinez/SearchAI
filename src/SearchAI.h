@@ -1,6 +1,7 @@
 #include <vector>
 #include <queue>
 #include <iostream>
+#include <stack>
 
 #include "Grid.h"
 
@@ -29,17 +30,19 @@ class SearchAI
 private:
     std::vector<Node*> closed;
     std::queue<Node*> open;
+    std::stack<Node*> openDFS;
     GridCell start;
     GridCell end;
     Grid* grid;
     Node* goal = nullptr;
     bool foundGoal = false;
+    bool usingBFS = true;
 
 public:
 
     SearchAI() {}
 
-    void init(GridCell start, GridCell end, Grid* grid);
+    void init(GridCell start, GridCell end, Grid* grid, bool useBFS = true);
     void step();
 
     std::vector<GridCell> getOpen();
