@@ -25,7 +25,7 @@ enum Action
 
 std::vector<GridCell> search(GridCell start, GridCell end);
 
-std::vector<GridCell> searchBFS(GridCell start, GridCell end, const Grid& grid);
+// std::vector<GridCell> searchBFS(GridCell start, GridCell end, const Grid& grid);
 
 class SearchAI
 {

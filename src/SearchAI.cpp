@@ -56,7 +56,7 @@ GridCell doAction(GridCell state, Action act)
     return state;
 }
 
-bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid)
+bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid, const std::vector<GridCell>& open)
 {
     GridCell nextState = doAction(state, act);
 
@@ -84,113 +84,121 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
         }
     }
 
+    for (GridCell c : open) // already in open list
+    {
+        if (c.col == nextState.col && c.row == nextState.row)
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
-std::vector<GridCell> searchBFS(GridCell start, GridCell end, const Grid& grid)
-{
+// std::vector<GridCell> searchBFS(GridCell start, GridCell end, const Grid& grid)
+// {
 
-    std::vector<Node*> closed;
-    std::queue<Node*> open;
+//     std::vector<Node*> closed;
+//     std::queue<Node*> open;
 
-    Node* initial = new Node;
-    initial->parent = nullptr;
-    initial->state = start;
-    open.push(initial);
-    initial = nullptr;
+//     Node* initial = new Node;
+//     initial->parent = nullptr;
+//     initial->state = start;
+//     open.push(initial);
+//     initial = nullptr;
 
-    // WARNING: make sure to clean up nodes in heap
+//     // WARNING: make sure to clean up nodes in heap
 
-    while (true)
-    {
-        if (open.empty()) // no solution
-        {
-            // Free memory 
-            for (Node* &n : closed)
-            {
-                delete n;
-                n = nullptr;
-            }
-            while (!open.empty())
-            {
-                Node* &n = open.front();
-                open.pop();
+//     while (true)
+//     {
+//         if (open.empty()) // no solution
+//         {
+//             // Free memory 
+//             for (Node* &n : closed)
+//             {
+//                 delete n;
+//                 n = nullptr;
+//             }
+//             while (!open.empty())
+//             {
+//                 Node* &n = open.front();
+//                 open.pop();
 
-                delete n;
-                n = nullptr;
-            }
+//                 delete n;
+//                 n = nullptr;
+//             }
 
-            std::vector<GridCell> empty;
-            return empty;
-        }
+//             std::vector<GridCell> empty;
+//             return empty;
+//         }
 
-        Node* n = open.front();
-        open.pop();
+//         Node* n = open.front();
+//         open.pop();
 
-        if (n->state.row == end.row && n->state.col == end.col) // at goal
-        {
-            // create solution list
-            std::vector<GridCell> solution;
-            Node* cur = n;
-            while (cur != nullptr)
-            {
-                solution.push_back(cur->state);
-                cur = cur->parent;
-            }
+//         if (n->state.row == end.row && n->state.col == end.col) // at goal
+//         {
+//             // create solution list
+//             std::vector<GridCell> solution;
+//             Node* cur = n;
+//             while (cur != nullptr)
+//             {
+//                 solution.push_back(cur->state);
+//                 cur = cur->parent;
+//             }
 
-            // Free memory
-            for (Node* &n : closed)
-            {
-                delete n;
-                n = nullptr;
-            }
-            while (!open.empty())
-            {
-                Node* &n = open.front();
-                open.pop();
+//             // Free memory
+//             for (Node* &n : closed)
+//             {
+//                 delete n;
+//                 n = nullptr;
+//             }
+//             while (!open.empty())
+//             {
+//                 Node* &n = open.front();
+//                 open.pop();
 
-                delete n;
-                n = nullptr;
-            }
-            delete n;
-            n = nullptr;
+//                 delete n;
+//                 n = nullptr;
+//             }
+//             delete n;
+//             n = nullptr;
 
-            return solution;
-        }
+//             return solution;
+//         }
 
-        // Expand node
+//         // Expand node
 
-        closed.push_back(n);
-        if (isValidAction(n->state, UP, closed, grid))
-        {
-            Node* child = new Node;
-            child->state = doAction(n->state, UP);
-            child->parent = n;
-            open.push(child);
-        }
-        if (isValidAction(n->state, DOWN, closed, grid))
-        {
-            Node* child = new Node;
-            child->state = doAction(n->state, DOWN);
-            child->parent = n;
-            open.push(child);
-        }
-        if (isValidAction(n->state, LEFT, closed, grid))
-        {
-            Node* child = new Node;
-            child->state = doAction(n->state, LEFT);
-            child->parent = n;
-            open.push(child);
-        }
-        if (isValidAction(n->state, RIGHT, closed, grid))
-        {
-            Node* child = new Node;
-            child->state = doAction(n->state, RIGHT);
-            child->parent = n;
-            open.push(child);
-        }
-    }
-}
+//         closed.push_back(n);
+//         if (isValidAction(n->state, UP, closed, grid))
+//         {
+//             Node* child = new Node;
+//             child->state = doAction(n->state, UP);
+//             child->parent = n;
+//             open.push(child);
+//         }
+//         if (isValidAction(n->state, DOWN, closed, grid))
+//         {
+//             Node* child = new Node;
+//             child->state = doAction(n->state, DOWN);
+//             child->parent = n;
+//             open.push(child);
+//         }
+//         if (isValidAction(n->state, LEFT, closed, grid))
+//         {
+//             Node* child = new Node;
+//             child->state = doAction(n->state, LEFT);
+//             child->parent = n;
+//             open.push(child);
+//         }
+//         if (isValidAction(n->state, RIGHT, closed, grid))
+//         {
+//             Node* child = new Node;
+//             child->state = doAction(n->state, RIGHT);
+//             child->parent = n;
+//             open.push(child);
+//         }
+//     }
+// }
 
 
 void SearchAI::init(GridCell start, GridCell end, Grid* grid)
@@ -222,8 +230,11 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid)
 
 void SearchAI::step()
 {
+    std::cout << "STEP\n";
+
     if (this->open.empty() || this->foundGoal) // no solution / done
     {
+        std::cout << "Open Empty or Found Goal\n";
         return;
     }
 
@@ -231,6 +242,7 @@ void SearchAI::step()
 
     if (n->state.row == this->end.row && n->state.col == this->end.col) // at goal
     {
+        std::cout << "At goal\n";
         this->foundGoal = true;
         return;
     }
@@ -240,29 +252,34 @@ void SearchAI::step()
     open.pop();
     closed.push_back(n);
 
-    if (isValidAction(n->state, UP, closed, *this->grid))
+    const std::vector<GridCell> openList = this->getOpen();
+    if (isValidAction(n->state, UP, closed, *this->grid, openList))
     {
+        std::cout << "  Do Action Up\n";
         Node* child = new Node;
         child->state = doAction(n->state, UP);
         child->parent = n;
         open.push(child);
     }
-    if (isValidAction(n->state, DOWN, closed, *this->grid))
+    if (isValidAction(n->state, DOWN, closed, *this->grid, openList))
     {
+        std::cout << "  Do Action Down\n";
         Node* child = new Node;
         child->state = doAction(n->state, DOWN);
         child->parent = n;
         open.push(child);
     }
-    if (isValidAction(n->state, LEFT, closed, *this->grid))
+    if (isValidAction(n->state, LEFT, closed, *this->grid, openList))
     {
+        std::cout << "  Do Action Left\n";
         Node* child = new Node;
         child->state = doAction(n->state, LEFT);
         child->parent = n;
         open.push(child);
     }
-    if (isValidAction(n->state, RIGHT, closed, *this->grid))
+    if (isValidAction(n->state, RIGHT, closed, *this->grid, openList))
     {
+        std::cout << "  Do Action Right\n";
         Node* child = new Node;
         child->state = doAction(n->state, RIGHT);
         child->parent = n;
