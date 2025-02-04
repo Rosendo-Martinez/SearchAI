@@ -144,12 +144,19 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
     if (this->usingBFS)
     {
         this->open.push(initial);
-        std::cout << "init bfs: size: " << this->open.size() << '\n';
+        // std::cout << "init bfs: size: " << this->open.size() << '\n';
     }
     else
     {
         this->openDFS.push(initial);
+        // std::cout << "init dfs: size: " << this->openDFS.size() << '\n';
+    }
+
+    if (!this->usingBFS)
+    {
         std::cout << "init dfs: size: " << this->openDFS.size() << '\n';
+        std::cout << "foundGoal = " << this->foundGoal << '\n';
+        std::cout << "done() = " << this->done() << '\n';
     }
 }
 
@@ -291,7 +298,7 @@ std::vector<GridCell> SearchAI::getOpen()
             openVec.push_back(n->state);
         }
 
-        for (unsigned int i = copyOfOpen.size() - 1; i > -1; i--) // restore stack
+        for (int i = copyOfOpen.size() - 1; i > -1; i--) // restore stack
         {
             this->openDFS.push(copyOfOpen[i]);
         }
@@ -334,12 +341,15 @@ std::vector<GridCell> SearchAI::getSolution()
 // true if found goal, else false
 bool SearchAI::done()
 {
+    // std::cout << "done() = ";
     if (this->usingBFS)
     { 
+        // std::cout << (foundGoal || this->open.empty()) << '\n';
         return foundGoal || this->open.empty();
     }
     else
     {
+        // std::cout << (foundGoal || this->openDFS.empty()) << '\n';
         return foundGoal || this->openDFS.empty();
     }
 }
