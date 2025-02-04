@@ -38,8 +38,6 @@ float lastAnimation = 0.0f;
 const float ANIMATION_INTERVAL = 0.4f; // seconds
 bool animate = false;
 
-bool loggedAIFinished = true;
-
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
@@ -101,12 +99,6 @@ int main()
     {
         float currentFrame = glfwGetTime();
 
-        if (ai.done() && !loggedAIFinished)
-        {
-            std::cout << "AI DONE\n";
-            loggedAIFinished = true;
-        }
-
         if (selectedPathEndpoints == 2 && !ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
         {
             ai.step();
@@ -117,7 +109,6 @@ int main()
         {
             ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, usingBFS);
             reInitAI = false;
-            loggedAIFinished = false;
         }
 
         processInput(window);
