@@ -26,6 +26,12 @@ bool pathStartSelected = true;
 bool reInitAI = true;
 SearchAI ai;
 
+float lastAnimation = 0.0f;
+const float ANIMATION_INTERVAL = 0.4f; // seconds
+bool animate = false;
+
+bool loggedAIFinished = true;
+
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
@@ -35,6 +41,7 @@ GridCell getCellThatMouseIsOn(Grid& grid,const glm::vec2& mousePos, float gridWi
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer, glm::vec3 color);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main()
 {
@@ -51,6 +58,7 @@ int main()
     // Events
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     // Shader, and renderer
     Shader shader;
@@ -83,10 +91,25 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+
+        if (ai.done() && !loggedAIFinished)
+        {
+            std::cout << "AI DONE\n";
+            loggedAIFinished = true;
+        }
+
+        if (!ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
+        {
+            ai.step();
+            lastAnimation = currentFrame;
+        }
+
         if (reInitAI)
         {
             ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid);
             reInitAI = false;
+            loggedAIFinished = false;
         }
 
         processInput(window);
@@ -131,13 +154,14 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
     }
     
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        while (!ai.done())
-        {
-            ai.step();
-        }
-    }
+    // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    // {
+    //     // while (!ai.done())
+    //     // {
+    //     //     ai.step();
+    //     // }
+    //     animate = !animate;
+    // }
 }
 
 /**
@@ -285,3 +309,10 @@ void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeigh
     renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+        animate = !animate;
+    }
+}
