@@ -27,7 +27,6 @@ glm::vec2 mousePos;
 
 glm::vec2 pathStart;
 glm::vec2 pathEnd;
-bool pathStartSelected = true;
 unsigned int selectedPathEndpoints = 0;
 
 bool reInitAI = true;
@@ -67,9 +66,9 @@ int main()
     glfwSetKeyCallback(window, key_callback);
 
     // Shader, and renderer
-    Shader shader;
-    shader.compile("./shaders/square.vs", "./shaders/square.fs");
-    SquareRenderer renderer(shader);
+    Shader squareShader;
+    squareShader.compile("./shaders/square.vs", "./shaders/square.fs");
+    SquareRenderer squareRenderer(squareShader);
 
     Shader lineShader;
     lineShader.compile("./shaders/line.vs", "./shaders/line.fs");
@@ -86,8 +85,8 @@ int main()
     } projConfig;
 
     glm::mat4 projection = glm::ortho(projConfig.left, projConfig.right, projConfig.bottom, projConfig.top, projConfig.near, projConfig.far);
-    shader.use();
-    shader.setMat4("projection", projection);
+    squareShader.use();
+    squareShader.setMat4("projection", projection);
     lineShader.use();
     lineShader.setMat4("projection", projection);
 
@@ -116,40 +115,40 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
+        drawGrid(grid, squareRenderer, SCR_WIDTH, SCR_HEIGHT);
 
         if (selectedPathEndpoints == 2)
         {
             std::vector<GridCell> openList = ai.getOpen();
             for (GridCell c : openList)
             {
-                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, OPEN_CELL);
+                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, OPEN_CELL);
             }
             std::vector<GridCell> closedList = ai.getClosed();
             for (GridCell c : closedList)
             {
-                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, CLOSED_CELL);
+                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, CLOSED_CELL);
             }
             std::vector<GridCell> solution = ai.getSolution();
             for (GridCell c : solution)
             {
-                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
             }
         }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
-        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, MOUSE_COLOR);
+        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, MOUSE_COLOR);
 
         GridCell pathStartCell = getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT);
         GridCell pathEndCell = getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT);
         if (selectedPathEndpoints == 1)
         {
-            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
         }
         else if (selectedPathEndpoints == 2)
         {
-            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
-            drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+            drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
         }
 
         drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
@@ -297,8 +296,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             selectedPathEndpoints = 2;
             reInitAI = true;
         }
-
-        // pathStartSelected = !pathStartSelected;
     }
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
