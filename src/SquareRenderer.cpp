@@ -1,7 +1,18 @@
 #include <glad/glad.h>
 #include "SquareRenderer.h"
 
+SquareRenderer::SquareRenderer()
+{
+    this->initVAO();
+}
+
 SquareRenderer::SquareRenderer(Shader shader)
+{
+    this->shader = shader;
+    this->initVAO();
+}
+
+void SquareRenderer::initVAO()
 {
     // square
     const float vertices[] = {
@@ -28,7 +39,11 @@ SquareRenderer::SquareRenderer(Shader shader)
     glEnableVertexAttribArray(0);
 
     this->VAO = VAO;
-    this->shader = shader;
+}
+
+void SquareRenderer::setShader(Shader newShader)
+{
+    this->shader = newShader;
 }
 
 void SquareRenderer::draw(const glm::vec3& color, const glm::vec2& translate, const glm::vec2& scale)
