@@ -21,12 +21,14 @@ const glm::vec3 SOLUTION_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
 const glm::vec3 CLOSED_CELL = glm::vec3(0.725f, 0.024f, 0.035f);
 const glm::vec3 OPEN_CELL = glm::vec3(0.976f, 0.792f, 0.012f);
 const glm::vec3 GRID_LINES_COLOR = glm::vec3(0.1f);
+const glm::vec3 MOUSE_COLOR = glm::vec3(0.0f, 0.75f, 1.0f);
 
 glm::vec2 mousePos;
 
 glm::vec2 pathStart;
 glm::vec2 pathEnd;
 bool pathStartSelected = true;
+unsigned int selectedPathEndpoints = 0;
 
 bool reInitAI = true;
 SearchAI ai;
@@ -105,13 +107,13 @@ int main()
             loggedAIFinished = true;
         }
 
-        if (!ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
+        if (selectedPathEndpoints == 2 && !ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
         {
             ai.step();
             lastAnimation = currentFrame;
         }
 
-        if (reInitAI)
+        if (reInitAI && selectedPathEndpoints == 2)
         {
             ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, usingBFS);
             reInitAI = false;
@@ -124,31 +126,42 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
-        drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
 
-        std::vector<GridCell> openList = ai.getOpen();
-        for (GridCell c : openList)
+        if (selectedPathEndpoints == 2)
         {
-            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, OPEN_CELL);
-        }
-        std::vector<GridCell> closedList = ai.getClosed();
-        for (GridCell c : closedList)
-        {
-            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, CLOSED_CELL);
-        }
-        std::vector<GridCell> solution = ai.getSolution();
-        for (GridCell c : solution)
-        {
-            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+            std::vector<GridCell> openList = ai.getOpen();
+            for (GridCell c : openList)
+            {
+                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, OPEN_CELL);
+            }
+            std::vector<GridCell> closedList = ai.getClosed();
+            for (GridCell c : closedList)
+            {
+                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, CLOSED_CELL);
+            }
+            std::vector<GridCell> solution = ai.getSolution();
+            for (GridCell c : solution)
+            {
+                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+            }
         }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
-        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.9, 0.01, 0.01));
+        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, MOUSE_COLOR);
 
         GridCell pathStartCell = getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT);
         GridCell pathEndCell = getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT);
-        drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
-        drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+        if (selectedPathEndpoints == 1)
+        {
+            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+        }
+        else if (selectedPathEndpoints == 2)
+        {
+            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+            drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, SOLUTION_COLOR);
+        }
+
+        drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -282,17 +295,19 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        if (pathStartSelected)
+        if (selectedPathEndpoints == 0 || selectedPathEndpoints == 2)
         {
             pathStart = glm::vec2(xpos, ypos);
+            selectedPathEndpoints = 1;
         }
         else 
         {
             pathEnd = glm::vec2(xpos,ypos);
+            selectedPathEndpoints = 2;
+            reInitAI = true;
         }
 
-        pathStartSelected = !pathStartSelected;
-        reInitAI = true;
+        // pathStartSelected = !pathStartSelected;
     }
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
