@@ -3,16 +3,9 @@
 
 SquareRenderer::SquareRenderer()
 {
-    this->initVAO();
 }
 
-SquareRenderer::SquareRenderer(Shader shader)
-{
-    this->shader = shader;
-    this->initVAO();
-}
-
-void SquareRenderer::initVAO()
+void SquareRenderer::init(Shader shader)
 {
     // square
     const float vertices[] = {
@@ -39,11 +32,7 @@ void SquareRenderer::initVAO()
     glEnableVertexAttribArray(0);
 
     this->VAO = VAO;
-}
-
-void SquareRenderer::setShader(Shader newShader)
-{
-    this->shader = newShader;
+    this->shader = shader;
 }
 
 void SquareRenderer::draw(const glm::vec3& color, const glm::vec2& translate, const glm::vec2& scale)

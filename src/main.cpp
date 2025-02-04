@@ -37,6 +37,8 @@ float lastAnimation = 0.0f;
 const float ANIMATION_INTERVAL = 0.4f; // seconds
 bool animate = false;
 
+Grid grid;
+
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
@@ -68,11 +70,13 @@ int main()
     // Shader, and renderer
     Shader squareShader;
     squareShader.compile("./shaders/square.vs", "./shaders/square.fs");
-    SquareRenderer squareRenderer(squareShader);
+    SquareRenderer squareRenderer;
+    squareRenderer.init(squareShader);
 
     Shader lineShader;
     lineShader.compile("./shaders/line.vs", "./shaders/line.fs");
-    LineRenderer lineRenderer(lineShader);
+    LineRenderer lineRenderer;
+    lineRenderer.init(lineShader);
 
     struct ProjectionConfig
     {
@@ -91,7 +95,7 @@ int main()
     lineShader.setMat4("projection", projection);
 
     initializeGridData();
-    Grid grid(gridData->rows, gridData->cols);
+    grid.createGrid(gridData->rows, gridData->cols);
     loadGrid(grid, gridData->rawData);
 
     while (!glfwWindowShouldClose(window))

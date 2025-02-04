@@ -3,21 +3,9 @@
 
 LineRenderer::LineRenderer()
 {
-    this->initVAO();
 }
 
-void LineRenderer::setShader(Shader shader)
-{
-    this->shader = shader;
-}
-
-LineRenderer::LineRenderer(Shader shader)
-{
-    this->shader = shader;
-    this->initVAO();
-}
-
-void LineRenderer::initVAO()
+void LineRenderer::init(Shader shader)
 {
     const float vertices[] = 
     {
@@ -40,6 +28,7 @@ void LineRenderer::initVAO()
     glEnableVertexAttribArray(0);
 
     this->VAO = VAO;
+    this->shader = shader;
 }
 
 void LineRenderer::draw(const glm::vec3& color, const glm::vec2& start, const glm::vec2& end)
