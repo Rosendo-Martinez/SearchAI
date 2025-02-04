@@ -18,22 +18,17 @@ struct Node
 
 enum Action
 {
-    // up is -y
-    // right is +x
+    // up is -y, right is +x
     UP, DOWN, LEFT, RIGHT
 };
 
-std::vector<GridCell> search(GridCell start, GridCell end);
-
-// std::vector<GridCell> searchBFS(GridCell start, GridCell end, const Grid& grid);
+std::vector<GridCell> searchDumb(GridCell start, GridCell end);
 
 class SearchAI
 {
 private:
     std::vector<Node*> closed;
     std::queue<Node*> open;
-    // std::vector<Node*> openAndClosed; // TODO?
-    // unsigned int nextNode = 0;
     GridCell start;
     GridCell end;
     Grid* grid;

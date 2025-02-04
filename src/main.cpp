@@ -128,7 +128,7 @@ int main()
         std::vector<GridCell> closedList = ai.getClosed();
         for (GridCell c : closedList)
         {
-            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(1.0, 1.0, 0.0));
+            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.8, 0.1, 0.0));
         }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);

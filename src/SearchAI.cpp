@@ -1,8 +1,12 @@
 #include "SearchAI.h"
 
 
-// Solution returned backwards.
-std::vector<GridCell> search(GridCell start, GridCell end)
+/**
+ * Very simple search AI. It just goes straight to the goal.
+ * 
+ * Solution returned backwards in vector.
+ */
+std::vector<GridCell> searchDumb(GridCell start, GridCell end)
 {
     std::vector<GridCell> solution;
 
@@ -11,10 +15,12 @@ std::vector<GridCell> search(GridCell start, GridCell end)
     {
         solution.push_back(current);
 
-        if (current.row == end.row && current.col == end.col)
+        if (current.row == end.row && current.col == end.col) // goal found
         {
             return solution;
         }
+
+        // Move to next grid cell
 
         if (current.col < end.col)
         {
@@ -76,7 +82,7 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
         return false;
     }
 
-    for (const auto& n : closed) // already explored state
+    for (const auto& n : closed) // in closed list
     {
         if (n->state.col == nextState.col && n->state.row == nextState.row)
         {
@@ -84,7 +90,7 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
         }
     }
 
-    for (GridCell c : open) // already in open list
+    for (GridCell c : open) // in open list
     {
         if (c.col == nextState.col && c.row == nextState.row)
         {
@@ -111,11 +117,14 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid)
         delete n;
     }
 
+    // init.
+
     this->start = start;
     this->end = end;
     this->grid = grid;
     this->foundGoal = false;
 
+    // init. state
     Node* initial = new Node;
     initial->parent = nullptr;
     initial->state = start;
@@ -183,7 +192,7 @@ void SearchAI::step()
 
 std::vector<GridCell> SearchAI::getOpen()
 {
-    std::vector<Node*> copyOfOpen; // Make copy of queue as vector
+    std::vector<Node*> copyOfOpen; // Make copy of queue
     while (!this->open.empty())
     {
         copyOfOpen.push_back(this->open.front());
@@ -191,7 +200,7 @@ std::vector<GridCell> SearchAI::getOpen()
     }
 
 
-    std::vector<GridCell> openVec; // Create return list
+    std::vector<GridCell> openVec; // Create list to return
     for (Node* n : copyOfOpen)
     {
         openVec.push_back(n->state);
