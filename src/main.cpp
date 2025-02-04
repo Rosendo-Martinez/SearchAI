@@ -330,9 +330,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
-        if (ai.done())
+        if (ai.done() && selectedPathEndpoints == 2)
         {
             reInitAI = true;
+            animate = true;
         }
         else
         {
