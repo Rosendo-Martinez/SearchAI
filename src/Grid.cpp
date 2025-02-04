@@ -1,25 +1,42 @@
 #include "Grid.h"
 
-Grid::Grid(unsigned int numberOfRows, unsigned int numberOfColumns)
-    : rows(numberOfRows), columns(numberOfColumns)
+/**
+ * Does not allocate memory for grid.
+ */
+Grid::Grid()
 {
-    // Create 2D array
-    this->grid = new unsigned int*[numberOfRows];
-    for (unsigned int i = 0; i < numberOfRows; i++)
-    {
-        this->grid[i] = new unsigned int[numberOfColumns];
-        // TODO: initialize with default value
-    }
+}
+
+/**
+ * Calls createGrid() to create the grid.
+ */
+Grid::Grid(unsigned int numberOfRows, unsigned int numberOfColumns)
+{
+    this->createGrid(numberOfRows, numberOfColumns);
 }
 
 Grid::~Grid()
 {
-    // free memory
-    for (unsigned int i = 0; i < this->rows; i++)
+    this->free();
+}
+
+/**
+ * Allocates memory for the grid.
+ */
+void Grid::createGrid(unsigned int rows, unsigned int columns)
+{
+    this->free(); // free old mem.
+
+    // Create 2D array
+    this->grid = new unsigned int*[rows];
+    for (unsigned int i = 0; i < rows; i++)
     {
-        delete[] this->grid[i];
+        this->grid[i] = new unsigned int[columns];
+        // TODO: initialize with default value
     }
-    delete[] this->grid;
+
+    this->rows = rows;
+    this->columns = columns;
 }
 
 /**
@@ -46,4 +63,20 @@ unsigned int Grid::getNumberOfRows() const
 unsigned int Grid::getNumberOfColumns() const
 {
     return this->columns;
+}
+
+/**
+ * Frees memory.
+ */
+void Grid::free()
+{
+    if (this->grid != nullptr)
+    {
+        // free memory
+        for (unsigned int i = 0; i < this->rows; i++)
+        {
+            delete[] this->grid[i];
+        }
+        delete[] this->grid;
+    }
 }
