@@ -7,7 +7,6 @@
 
 #include "Shader.h"
 #include "SquareRenderer.h"
-// #include "Grid.h"
 #include "GridRawData.h"
 #include "LineRenderer.h"
 #include "SearchAI.h"
@@ -18,20 +17,13 @@ const glm::vec3 CELL_COLORS[] =
     glm::vec3(1.0f)  // 1 
 };
 
-// struct GridCell
-// {
-//     unsigned int row;
-//     unsigned int col;
-// };
-
 glm::vec2 mousePos;
 
 glm::vec2 pathStart;
 glm::vec2 pathEnd;
 bool pathStartSelected = true;
-bool recalculate = false;
 
-bool reInitAI = false;
+bool reInitAI = true;
 SearchAI ai;
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
@@ -89,17 +81,8 @@ int main()
     Grid grid(gridData->rows, gridData->cols);
     loadGrid(grid, gridData->rawData);
 
-    // std::vector<GridCell> solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
     while (!glfwWindowShouldClose(window))
     {
-        // std::vector<GridCell> solutionPath = search(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
-        // if (recalculate)
-        // {
-        //     // solutionPath = searchBFS(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), grid);
-        //     recalculate = false;
-        // }
-        // std::cout << solutionPath.size() << '\n';
-
         if (reInitAI)
         {
             ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid);
@@ -114,15 +97,9 @@ int main()
         drawGrid(grid, renderer, SCR_WIDTH, SCR_HEIGHT);
         drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
 
-        // for (auto& cell : solutionPath)
-        // {
-        //     drawCell(cell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.25, 0.25, 0.0));
-        // }
-
         std::vector<GridCell> openList = ai.getOpen();
         for (GridCell c : openList)
         {
-            // std::cout << "By?\n";
             drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.0, 0.0, 1.0));
         }
         std::vector<GridCell> closedList = ai.getClosed();
@@ -149,8 +126,18 @@ int main()
 
 void processInput(GLFWwindow *window)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
+    }
+    
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        while (!ai.done())
+        {
+            ai.step();
+        }
+    }
 }
 
 /**
@@ -279,7 +266,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         }
 
         pathStartSelected = !pathStartSelected;
-        // recalculate = true;
         reInitAI = true;
     }
 

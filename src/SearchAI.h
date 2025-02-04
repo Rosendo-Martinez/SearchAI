@@ -32,7 +32,7 @@ private:
     GridCell start;
     GridCell end;
     Grid* grid;
-    bool foundGoal = false;
+    bool foundGoal = true;
 
 public:
 
@@ -43,4 +43,5 @@ public:
 
     std::vector<GridCell> getOpen();
     std::vector<GridCell> getClosed();
+    bool done();
 };

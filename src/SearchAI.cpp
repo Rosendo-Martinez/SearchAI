@@ -119,6 +119,9 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid)
 
     // init.
 
+    // std::cout << "Start: " << start.row << ' ' << start.col << '\n';
+    // std::cout << "End: " << end.row << ' ' << end.col << '\n';
+
     this->start = start;
     this->end = end;
     this->grid = grid;
@@ -133,11 +136,11 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid)
 
 void SearchAI::step()
 {
-    std::cout << "STEP\n";
+    // std::cout << "STEP\n";
 
     if (this->open.empty() || this->foundGoal) // no solution / done
     {
-        std::cout << "  Open Empty or Found Goal\n";
+        // std::cout << "  Open Empty or Found Goal\n";
         return;
     }
 
@@ -145,7 +148,7 @@ void SearchAI::step()
 
     if (n->state.row == this->end.row && n->state.col == this->end.col) // at goal
     {
-        std::cout << "  At goal\n";
+        // std::cout << "  At goal\n";
         this->foundGoal = true;
         return;
     }
@@ -158,7 +161,7 @@ void SearchAI::step()
     const std::vector<GridCell> openList = this->getOpen();
     if (isValidAction(n->state, UP, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Up\n";
+        // std::cout << "  Do Action Up\n";
         Node* child = new Node;
         child->state = doAction(n->state, UP);
         child->parent = n;
@@ -166,7 +169,7 @@ void SearchAI::step()
     }
     if (isValidAction(n->state, DOWN, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Down\n";
+        // std::cout << "  Do Action Down\n";
         Node* child = new Node;
         child->state = doAction(n->state, DOWN);
         child->parent = n;
@@ -174,7 +177,7 @@ void SearchAI::step()
     }
     if (isValidAction(n->state, LEFT, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Left\n";
+        // std::cout << "  Do Action Left\n";
         Node* child = new Node;
         child->state = doAction(n->state, LEFT);
         child->parent = n;
@@ -182,7 +185,7 @@ void SearchAI::step()
     }
     if (isValidAction(n->state, RIGHT, closed, *this->grid, openList))
     {
-        std::cout << "  Do Action Right\n";
+        // std::cout << "  Do Action Right\n";
         Node* child = new Node;
         child->state = doAction(n->state, RIGHT);
         child->parent = n;
@@ -224,4 +227,10 @@ std::vector<GridCell> SearchAI::getClosed()
     }
 
     return toReturn;
+}
+
+// true if found goal, else false
+bool SearchAI::done()
+{
+    return foundGoal || this->open.empty();
 }
