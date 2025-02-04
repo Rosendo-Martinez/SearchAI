@@ -126,6 +126,7 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid)
     this->end = end;
     this->grid = grid;
     this->foundGoal = false;
+    this->goal = nullptr;
 
     // init. state
     Node* initial = new Node;
@@ -150,6 +151,7 @@ void SearchAI::step()
     {
         // std::cout << "  At goal\n";
         this->foundGoal = true;
+        this->goal = n;
         return;
     }
 
@@ -227,6 +229,25 @@ std::vector<GridCell> SearchAI::getClosed()
     }
 
     return toReturn;
+}
+
+std::vector<GridCell> SearchAI::getSolution()
+{
+    std::vector<GridCell> sol;
+
+    if (!foundGoal) // no solution 
+    {
+        return sol;
+    }
+
+    Node* cur = this->goal;
+    while (cur != nullptr)
+    {
+        sol.push_back(cur->state);
+        cur = cur->parent;
+    }
+
+    return sol;
 }
 
 // true if found goal, else false

@@ -130,6 +130,11 @@ int main()
         {
             drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.8, 0.1, 0.0));
         }
+        std::vector<GridCell> solution = ai.getSolution();
+        for (GridCell c : solution)
+        {
+            drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(1.0, 1.0, 1.0));
+        }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
         drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, renderer, glm::vec3(0.9, 0.01, 0.01));
