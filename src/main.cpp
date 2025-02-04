@@ -5,22 +5,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 
-#include "Shader.h"
-#include "SquareRenderer.h"
+// #include "Shader.h"
+// #include "SquareRenderer.h"
 #include "GridRawData.h"
-#include "LineRenderer.h"
+// #include "LineRenderer.h"
 #include "SearchAI.h"
-
-const glm::vec3 CELL_COLORS[] = 
-{
-    glm::vec3(0.2f, 0.329f, 1.0f), // 0
-    glm::vec3(0.259f, 0.988f, 0.008f)  // 1 
-};
+#include "Renderer.h"
 
 const glm::vec3 SOLUTION_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
 const glm::vec3 CLOSED_CELL = glm::vec3(0.725f, 0.024f, 0.035f);
 const glm::vec3 OPEN_CELL = glm::vec3(0.976f, 0.792f, 0.012f);
-const glm::vec3 GRID_LINES_COLOR = glm::vec3(0.1f);
 const glm::vec3 MOUSE_COLOR = glm::vec3(0.0f, 0.75f, 1.0f);
 
 glm::vec2 mousePos;
@@ -41,13 +35,10 @@ Grid grid;
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
-void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight);
-void drawGridLines(const Grid& grid, LineRenderer& renderer, float gridWidth, float gridHeight);
 void loadGrid(Grid& grid, const char* rawData);
 GridCell getCellThatMouseIsOn(Grid& grid,const glm::vec2& mousePos, float gridWidth, float gridHeight);
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer, glm::vec3 color);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main()
@@ -67,32 +58,20 @@ int main()
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetKeyCallback(window, key_callback);
 
-    // Shader, and renderer
-    Shader squareShader;
-    squareShader.compile("./shaders/square.vs", "./shaders/square.fs");
-    SquareRenderer squareRenderer;
-    squareRenderer.init(squareShader);
+    // // Shader, and renderer
+    // Shader squareShader;
+    // squareShader.compile("./shaders/square.vs", "./shaders/square.fs");
+    // SquareRenderer squareRenderer;
+    // squareRenderer.init(squareShader);
 
-    Shader lineShader;
-    lineShader.compile("./shaders/line.vs", "./shaders/line.fs");
-    LineRenderer lineRenderer;
-    lineRenderer.init(lineShader);
+    // Shader lineShader;
+    // lineShader.compile("./shaders/line.vs", "./shaders/line.fs");
+    // LineRenderer lineRenderer;
+    // lineRenderer.init(lineShader);
 
-    struct ProjectionConfig
-    {
-        float top = 800.0f;
-        float bottom = 0.0f;
-        float left = 0.0f;
-        float right = 800.0f;
-        float near = 1.0f;
-        float far = -1.0f;
-    } projConfig;
-
-    glm::mat4 projection = glm::ortho(projConfig.left, projConfig.right, projConfig.bottom, projConfig.top, projConfig.near, projConfig.far);
-    squareShader.use();
-    squareShader.setMat4("projection", projection);
-    lineShader.use();
-    lineShader.setMat4("projection", projection);
+    Renderer renderer;
+    renderer.GRID_HEIGHT = SCR_HEIGHT;
+    renderer.GRID_WIDTH = SCR_WIDTH;
 
     initializeGridData();
     grid.createGrid(gridData->rows, gridData->cols);
@@ -119,43 +98,52 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        drawGrid(grid, squareRenderer, SCR_WIDTH, SCR_HEIGHT);
+        // drawGrid(grid, squareRenderer, SCR_WIDTH, SCR_HEIGHT);
+        renderer.drawGrid(grid);
 
         if (selectedPathEndpoints == 2)
         {
             std::vector<GridCell> openList = ai.getOpen();
             for (GridCell c : openList)
             {
-                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, OPEN_CELL);
+                // drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, OPEN_CELL);
+                renderer.drawCell(c, grid, OPEN_CELL);
             }
             std::vector<GridCell> closedList = ai.getClosed();
             for (GridCell c : closedList)
             {
-                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, CLOSED_CELL);
+                // drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, CLOSED_CELL);
+                renderer.drawCell(c, grid, CLOSED_CELL);
             }
             std::vector<GridCell> solution = ai.getSolution();
             for (GridCell c : solution)
             {
-                drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+                // drawCell(c, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+                renderer.drawCell(c, grid, SOLUTION_COLOR);
             }
         }
 
         GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
-        drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, MOUSE_COLOR);
+        // drawCell(mouseCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, MOUSE_COLOR);
+        renderer.drawCell(mouseCell, grid, MOUSE_COLOR);
 
         GridCell pathStartCell = getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT);
         GridCell pathEndCell = getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT);
         if (selectedPathEndpoints == 1)
         {
-            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+            // drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+            renderer.drawCell(pathStartCell, grid, SOLUTION_COLOR);
         }
         else if (selectedPathEndpoints == 2)
         {
-            drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
-            drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+            // drawCell(pathStartCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+            // drawCell(pathEndCell, grid, SCR_WIDTH, SCR_HEIGHT, squareRenderer, SOLUTION_COLOR);
+            renderer.drawCell(pathStartCell, grid, SOLUTION_COLOR);
+            renderer.drawCell(pathEndCell, grid, SOLUTION_COLOR);
         }
 
-        drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
+        // drawGridLines(grid, lineRenderer, SCR_WIDTH, SCR_HEIGHT);
+        renderer.drawGridLines(grid);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -202,51 +190,6 @@ bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height)
     glViewport(0, 0, width, height);
 
     return true;
-}
-
-void drawGrid(const Grid& grid, SquareRenderer& renderer, float gridWidth, float gridHeight)
-{
-    const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
-    const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
-
-    for (unsigned int row = 0; row < grid.getNumberOfRows(); row++)
-    {
-        for (unsigned int col = 0; col < grid.getNumberOfColumns(); col++)
-        {
-            float xTranslation = ((float) col) * cellWidth;
-            float yTranslation = ((float) ((grid.getNumberOfRows() - 1) - row)) * cellHeight;
-            glm::vec3 color = CELL_COLORS[grid.get(row,col)];
-
-            renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
-        }
-    }
-}
-
-void drawGridLines(const Grid& grid, LineRenderer& renderer, float gridWidth, float gridHeight)
-{
-    const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
-    const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
-    const glm::vec3 color (0.1f, 0.01f, 0.9f);
-
-    // Draw horizontal lines
-    for (unsigned int i = 0; i < grid.getNumberOfRows() + 1; i++)
-    {
-        float y = cellHeight * i;
-        glm::vec2 start (0, y);
-        glm::vec2 end   (gridWidth, y);
-
-        renderer.draw(GRID_LINES_COLOR, start, end);
-    }
-
-    // Draw vertical lines
-    for (unsigned int i = 0; i < grid.getNumberOfColumns() + 1; i++)
-    {
-        float x = cellWidth * i;
-        glm::vec2 start (x, 0);
-        glm::vec2 end   (x, gridHeight);
-
-        renderer.draw(GRID_LINES_COLOR, start, end);
-    }
 }
 
 void loadGrid(Grid& grid, const char* rawData)
@@ -306,16 +249,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     {
         ai.step();
     }
-}
-
-void drawCell(const GridCell& cell, Grid& grid, float gridWidth, float gridHeight, SquareRenderer& renderer, glm::vec3 color)
-{
-    const float cellWidth = gridWidth / (float) grid.getNumberOfColumns();
-    const float cellHeight = gridHeight / (float) grid.getNumberOfRows();
-    float xTranslation = ((float) cell.col) * cellWidth;
-    float yTranslation = ((float) ((grid.getNumberOfRows() - 1) - cell.row)) * cellHeight;
-
-    renderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

@@ -5,12 +5,6 @@
 
 #include "Grid.h"
 
-struct GridCell
-{
-    unsigned int row;
-    unsigned int col;
-};
-
 struct Node
 {
     GridCell state;

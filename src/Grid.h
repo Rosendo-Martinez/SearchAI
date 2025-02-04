@@ -1,3 +1,12 @@
+#ifndef GRID_H
+#define GRID_H
+
+struct GridCell
+{
+    unsigned int row;
+    unsigned int col;
+};
+
 class Grid
 {
 public:
@@ -18,3 +27,5 @@ private:
 
     void free();
 };
+
+#endif
