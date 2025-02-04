@@ -14,7 +14,12 @@ Grid::Grid(unsigned int numberOfRows, unsigned int numberOfColumns)
 
 Grid::~Grid()
 {
-    // TODO
+    // free memory
+    for (unsigned int i = 0; i < this->rows; i++)
+    {
+        delete[] this->grid[i];
+    }
+    delete[] this->grid;
 }
 
 /**
