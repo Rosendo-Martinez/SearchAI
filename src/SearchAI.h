@@ -19,12 +19,30 @@ enum Action
 
 std::vector<GridCell> searchDumb(GridCell start, GridCell end);
 
+class StackOrQueue
+{
+public:
+    StackOrQueue();
+    StackOrQueue(bool isStack);
+
+    Node* pop();
+    void push(Node* node);
+    std::vector<GridCell> getGridCells();
+    bool isEmpty() const;
+
+private:
+    std::queue<Node*> queue;
+    std::stack<Node*> stack;
+    bool isStack;
+};
+
 class SearchAI
 {
 private:
     std::vector<Node*> closed;
-    std::queue<Node*> open;
-    std::stack<Node*> openDFS;
+    // std::queue<Node*> open;
+    // std::stack<Node*> openDFS;
+    StackOrQueue open;
     GridCell start;
     GridCell end;
     Grid* grid;
@@ -43,20 +61,4 @@ public:
     std::vector<GridCell> getClosed();
     std::vector<GridCell> getSolution();
     bool done();
-};
-
-class StackOrQueue
-{
-public:
-    StackOrQueue(bool isStack);
-
-    Node* pop();
-    void push(Node* node);
-    std::vector<GridCell> getGridCells();
-    bool isEmpty() const;
-
-private:
-    std::queue<Node*> queue;
-    std::stack<Node*> stack;
-    const bool isStack;
 };
