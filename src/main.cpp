@@ -139,9 +139,7 @@ int main()
         }
         else
         {
-            // std::cout << "Hello, top?\n";
             renderer.drawGrid(grid);
-            // std::cout << "Hello, bottom?\n";
             GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
             renderer.drawCell(mouseCell, grid, CELL_COLORS[selectedCellValue]);
             renderer.drawGridLines(grid);

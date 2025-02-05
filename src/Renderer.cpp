@@ -46,17 +46,11 @@ void Renderer::drawGrid(const Grid& grid)
             float xTranslation = ((float) col) * cellWidth;
             float yTranslation = ((float) ((grid.getNumberOfRows() - 1) - row)) * cellHeight;
 
-            if (grid.get(row, col) > 2)
-            {
-                std::cout << "Error grid value: " << grid.get(row,col) << '\n';
-            }
-            // std::cout << "Grid value = " << grid.get(row, col) << 'n';
             glm::vec3 color = CELL_COLORS[grid.get(row,col)];
 
             this->squareRenderer.draw(color, glm::vec2(xTranslation, yTranslation), glm::vec2(cellWidth, cellHeight));
         }
     }
-    // std::cout << "Hello, in between?\n";
 }
 
 void Renderer::drawGridLines(const Grid& grid)
