@@ -32,6 +32,9 @@ Grid grid;
 
 bool mapCreationMode = false;
 unsigned int selectedCellValue = 0;
+const unsigned int COUNT_GRID_DENSITIES = 5;
+const unsigned int GRID_DENSITIES[] = { 16, 32, 64, 128, 256 };
+unsigned int selectedGridDensity = 0;
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -64,7 +67,7 @@ int main()
     renderer.GRID_WIDTH = SCR_WIDTH;
 
     initializeGridData();
-    grid.createGrid(gridData->rows, gridData->cols);
+    grid.changeGrid(gridData->rows, gridData->cols);
     loadGrid(grid, gridData->rawData);
 
     while (!glfwWindowShouldClose(window))
@@ -136,7 +139,9 @@ int main()
         }
         else
         {
+            // std::cout << "Hello, top?\n";
             renderer.drawGrid(grid);
+            // std::cout << "Hello, bottom?\n";
             GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
             renderer.drawCell(mouseCell, grid, CELL_COLORS[selectedCellValue]);
             renderer.drawGridLines(grid);
@@ -295,6 +300,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             {
                 selectedCellValue = 0;
             }
+        }
+        if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+        {
+            selectedGridDensity++;
+
+            if (selectedGridDensity >= COUNT_GRID_DENSITIES)
+            {
+                selectedGridDensity = COUNT_GRID_DENSITIES - 1;
+            }
+
+            grid.changeGrid(GRID_DENSITIES[selectedGridDensity], GRID_DENSITIES[selectedGridDensity]);
+        }
+        if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+        {
+            if (selectedGridDensity > 0)
+            {
+                selectedGridDensity--;
+            }
+
+            grid.changeGrid(GRID_DENSITIES[selectedGridDensity], GRID_DENSITIES[selectedGridDensity]);
         }
     }
 }

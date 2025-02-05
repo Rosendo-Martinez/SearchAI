@@ -14,7 +14,7 @@ public:
     Grid();
     ~Grid();
 
-    void createGrid(unsigned int rows, unsigned int columns);
+    void changeGrid(unsigned int rows, unsigned int columns);
     unsigned int get(unsigned int i, unsigned int j) const;
     void set(unsigned int i, unsigned int j, unsigned int newValue);
     unsigned int getNumberOfRows() const;
@@ -26,6 +26,7 @@ private:
     unsigned int columns = 0; 
 
     void free();
+    void clear(unsigned int value);
 };
 
 #endif

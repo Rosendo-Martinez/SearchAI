@@ -12,7 +12,7 @@ Grid::Grid()
  */
 Grid::Grid(unsigned int numberOfRows, unsigned int numberOfColumns)
 {
-    this->createGrid(numberOfRows, numberOfColumns);
+    this->changeGrid(numberOfRows, numberOfColumns);
 }
 
 Grid::~Grid()
@@ -21,9 +21,10 @@ Grid::~Grid()
 }
 
 /**
- * Allocates memory for the grid.
+ * Allocates memory for new grid.
+ * Deallocates memory of old grid.
  */
-void Grid::createGrid(unsigned int rows, unsigned int columns)
+void Grid::changeGrid(unsigned int rows, unsigned int columns)
 {
     this->free(); // free old mem.
 
@@ -37,6 +38,8 @@ void Grid::createGrid(unsigned int rows, unsigned int columns)
 
     this->rows = rows;
     this->columns = columns;
+
+    this->clear(0); // default value
 }
 
 /**
@@ -78,5 +81,20 @@ void Grid::free()
             delete[] this->grid[i];
         }
         delete[] this->grid;
+    }
+}
+
+/**
+ * Clears the grid.
+ * All grid cells given the passed in value.
+ */
+void Grid::clear(unsigned int value)
+{
+    for (unsigned int i = 0; i < this->getNumberOfRows(); i++)
+    {
+        for (unsigned int j = 0; j < this->getNumberOfColumns(); j++)
+        {
+            this->grid[i][j] = value;
+        }
     }
 }
