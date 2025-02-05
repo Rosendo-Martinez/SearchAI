@@ -30,6 +30,8 @@ bool animate = false;
 
 Grid grid;
 
+bool mapCreationMode = false;
+
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
 void loadGrid(Grid& grid, const char* rawData);
@@ -66,61 +68,74 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
-
-        if (selectedPathEndpoints == 2 && !ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
-        {
-            ai.step();
-            lastAnimation = currentFrame;
-        }
-
-        if (reInitAI && selectedPathEndpoints == 2)
-        {
-            ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, usingBFS);
-            reInitAI = false;
-        }
-
         processInput(window);
+
+        if (!mapCreationMode)
+        {
+            if (selectedPathEndpoints == 2 && !ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
+            {
+                ai.step();
+                lastAnimation = currentFrame;
+            }
+
+            if (reInitAI && selectedPathEndpoints == 2)
+            {
+                ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, usingBFS);
+                reInitAI = false;
+            }
+        }
+        else
+        {
+
+        }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        renderer.drawGrid(grid);
-
-        if (selectedPathEndpoints == 2)
+        if (!mapCreationMode)
         {
-            std::vector<GridCell> openList = ai.getOpen();
-            for (GridCell c : openList)
+            renderer.drawGrid(grid);
+
+            if (selectedPathEndpoints == 2)
             {
-                renderer.drawCell(c, grid, OPEN_CELL);
+                std::vector<GridCell> openList = ai.getOpen();
+                for (GridCell c : openList)
+                {
+                    renderer.drawCell(c, grid, OPEN_CELL);
+                }
+                std::vector<GridCell> closedList = ai.getClosed();
+                for (GridCell c : closedList)
+                {
+                    renderer.drawCell(c, grid, CLOSED_CELL);
+                }
+                std::vector<GridCell> solution = ai.getSolution();
+                for (GridCell c : solution)
+                {
+                    renderer.drawCell(c, grid, SOLUTION_COLOR);
+                }
             }
-            std::vector<GridCell> closedList = ai.getClosed();
-            for (GridCell c : closedList)
+
+            GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
+            renderer.drawCell(mouseCell, grid, MOUSE_COLOR);
+
+            GridCell pathStartCell = getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT);
+            GridCell pathEndCell = getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT);
+            if (selectedPathEndpoints == 1)
             {
-                renderer.drawCell(c, grid, CLOSED_CELL);
+                renderer.drawCell(pathStartCell, grid, SOLUTION_COLOR);
             }
-            std::vector<GridCell> solution = ai.getSolution();
-            for (GridCell c : solution)
+            else if (selectedPathEndpoints == 2)
             {
-                renderer.drawCell(c, grid, SOLUTION_COLOR);
+                renderer.drawCell(pathStartCell, grid, SOLUTION_COLOR);
+                renderer.drawCell(pathEndCell, grid, SOLUTION_COLOR);
             }
+
+            renderer.drawGridLines(grid);
         }
-
-        GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
-        renderer.drawCell(mouseCell, grid, MOUSE_COLOR);
-
-        GridCell pathStartCell = getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT);
-        GridCell pathEndCell = getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT);
-        if (selectedPathEndpoints == 1)
+        else
         {
-            renderer.drawCell(pathStartCell, grid, SOLUTION_COLOR);
-        }
-        else if (selectedPathEndpoints == 2)
-        {
-            renderer.drawCell(pathStartCell, grid, SOLUTION_COLOR);
-            renderer.drawCell(pathEndCell, grid, SOLUTION_COLOR);
-        }
 
-        renderer.drawGridLines(grid);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -207,44 +222,60 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
 
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (!mapCreationMode)
     {
-        if (selectedPathEndpoints == 0 || selectedPathEndpoints == 2)
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
         {
-            pathStart = glm::vec2(xpos, ypos);
-            selectedPathEndpoints = 1;
+            if (selectedPathEndpoints == 0 || selectedPathEndpoints == 2)
+            {
+                pathStart = glm::vec2(xpos, ypos);
+                selectedPathEndpoints = 1;
+            }
+            else 
+            {
+                pathEnd = glm::vec2(xpos,ypos);
+                selectedPathEndpoints = 2;
+                reInitAI = true;
+            }
         }
-        else 
-        {
-            pathEnd = glm::vec2(xpos,ypos);
-            selectedPathEndpoints = 2;
-            reInitAI = true;
-        }
-    }
 
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-    {
-        ai.step();
+        if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        {
+            ai.step();
+        }
     }
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    if (key == GLFW_KEY_M && action == GLFW_PRESS)
     {
-        if (ai.done() && selectedPathEndpoints == 2)
+        mapCreationMode = !mapCreationMode;
+        std::cout << "Map creation mode: " << (mapCreationMode ? "ON" : "OFF") << '\n';
+    }
+
+    if (!mapCreationMode)
+    {
+        if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
         {
-            reInitAI = true;
-            animate = true;
+            if (ai.done() && selectedPathEndpoints == 2)
+            {
+                reInitAI = true;
+                animate = true;
+            }
+            else
+            {
+                animate = !animate;
+            }
         }
-        else
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
         {
-            animate = !animate;
+            usingBFS = !usingBFS;
+            reInitAI = true;
         }
     }
-    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+    else
     {
-        usingBFS = !usingBFS;
-        reInitAI = true;
+
     }
 }
