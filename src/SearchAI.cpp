@@ -130,6 +130,7 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
     Node* initial = new Node;
     initial->parent = nullptr;
     initial->state = start;
+    initial->depth = 0;
     this->open.push(initial);
 }
 
@@ -154,6 +155,11 @@ void SearchAI::step()
         return;
     }
 
+    if (n->depth == MAX_DEPTH) // at max depth
+    {
+        return;
+    }
+
     // Expand node
 
     const std::vector<GridCell> openList = this->getOpen();
@@ -163,6 +169,7 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, UP);
         child->parent = n;
+        child->depth = n->depth + 1;
         this->open.push(child);
     }
     if (isValidAction(n->state, DOWN, closed, *this->grid, openList))
@@ -171,6 +178,7 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, DOWN);
         child->parent = n;
+        child->depth = n->depth + 1;
         this->open.push(child);
     }
     if (isValidAction(n->state, LEFT, closed, *this->grid, openList))
@@ -179,6 +187,7 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, LEFT);
         child->parent = n;
+        child->depth = n->depth + 1;
         this->open.push(child);
     }
     if (isValidAction(n->state, RIGHT, closed, *this->grid, openList))
@@ -187,6 +196,7 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, RIGHT);
         child->parent = n;
+        child->depth = n->depth + 1;
         this->open.push(child);
     }   
 }

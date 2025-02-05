@@ -9,6 +9,7 @@ struct Node
 {
     GridCell state;
     Node* parent;
+    unsigned int depth;
 };
 
 enum Action
@@ -49,6 +50,7 @@ private:
     Node* goal = nullptr;
     bool foundGoal = false;
     bool usingBFS = true;
+    unsigned int MAX_DEPTH = 7;
 
 public:
 
