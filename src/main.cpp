@@ -223,6 +223,13 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
     mousePos.x = xpos;
     mousePos.y = ypos;
+
+    if (mapCreationMode && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    {
+        const glm::vec2 mousePOS (xpos, ypos); // what a POS mouse!
+        GridCell clickedCell = getCellThatMouseIsOn(grid, mousePOS, SCR_WIDTH, SCR_HEIGHT);
+        grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
+    }
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -252,12 +259,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             ai.step();
         }
     }
-    else
-    {
-        const glm::vec2 mousePOS (xpos, ypos); // what a POS mouse!
-        GridCell clickedCell = getCellThatMouseIsOn(grid, mousePOS, SCR_WIDTH, SCR_HEIGHT);
-        grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
-    }
+    // else
+    // {
+    //     const glm::vec2 mousePOS (xpos, ypos); // what a POS mouse!
+    //     GridCell clickedCell = getCellThatMouseIsOn(grid, mousePOS, SCR_WIDTH, SCR_HEIGHT);
+    //     grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
+    // }
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
