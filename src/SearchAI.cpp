@@ -164,10 +164,10 @@ void SearchAI::step()
         return;
     }
 
-    if (n->depth == MAX_DEPTH) // at max depth
-    {
-        return;
-    }
+    // if (n->depth == MAX_DEPTH) // at max depth
+    // {
+    //     return;
+    // }
 
     // Expand node
 
