@@ -112,17 +112,9 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
     while (!open.isEmpty())
     {
         Node* n = open.pop();
-        // open.pop();
 
         delete n;
     }
-    // while (!openDFS.empty())
-    // {
-    //     Node* n = openDFS.top();
-    //     openDFS.pop();
-
-    //     delete n;
-    // }
 
     // init.
 
@@ -132,20 +124,12 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
     this->foundGoal = false;
     this->goal = nullptr;
     this->usingBFS = useBFS;
-    this->open = StackOrQueue(!useBFS);
+    this->open = StackOrQueue(!useBFS); // BFS uses queue, DFS uses stack
 
     // init. state
     Node* initial = new Node;
     initial->parent = nullptr;
     initial->state = start;
-    // if (this->usingBFS)
-    // {
-    //     this->open.push(initial);
-    // }
-    // else
-    // {
-    //     this->openDFS.push(initial);
-    // }
     this->open.push(initial);
 }
 
@@ -159,9 +143,8 @@ void SearchAI::step()
         return;
     }
 
-    // Node* n = this->open.front();
-    // Node* n = this->usingBFS ? this->open.front() : this->openDFS.top();
     Node * n = this->open.pop();
+    closed.push_back(n);
 
     if (n->state.row == this->end.row && n->state.col == this->end.col) // at goal
     {
@@ -172,16 +155,6 @@ void SearchAI::step()
     }
 
     // Expand node
-    
-    // if (this->usingBFS)
-    // {
-    //     open.pop();
-    // }
-    // else 
-    // {
-    //     openDFS.pop();
-    // }
-    closed.push_back(n);
 
     const std::vector<GridCell> openList = this->getOpen();
     if (isValidAction(n->state, UP, closed, *this->grid, openList))
@@ -190,15 +163,6 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, UP);
         child->parent = n;
-
-        // if (this->usingBFS)
-        // {
-        //     this->open.push(child);
-        // }
-        // else
-        // {
-        //     this->openDFS.push(child);
-        // }
         this->open.push(child);
     }
     if (isValidAction(n->state, DOWN, closed, *this->grid, openList))
@@ -207,15 +171,6 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, DOWN);
         child->parent = n;
-        
-        // if (this->usingBFS)
-        // {
-        //     this->open.push(child);
-        // }
-        // else
-        // {
-        //     this->openDFS.push(child);
-        // }
         this->open.push(child);
     }
     if (isValidAction(n->state, LEFT, closed, *this->grid, openList))
@@ -224,15 +179,6 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, LEFT);
         child->parent = n;
-
-        // if (this->usingBFS)
-        // {
-        //     this->open.push(child);
-        // }
-        // else
-        // {
-        //     this->openDFS.push(child);
-        // }
         this->open.push(child);
     }
     if (isValidAction(n->state, RIGHT, closed, *this->grid, openList))
@@ -241,64 +187,12 @@ void SearchAI::step()
         Node* child = new Node;
         child->state = doAction(n->state, RIGHT);
         child->parent = n;
-
-        // if (this->usingBFS)
-        // {
-        //     this->open.push(child);
-        // }
-        // else
-        // {
-        //     this->openDFS.push(child);
-        // }
         this->open.push(child);
     }   
 }
 
 std::vector<GridCell> SearchAI::getOpen()
 {
-    // std::vector<GridCell> openVec; // Create list to return
-
-    // if (this->usingBFS)
-    // {
-    //     std::vector<Node*> copyOfOpen; // Make copy of queue
-    //     while (!this->open.empty())
-    //     {
-    //         copyOfOpen.push_back(this->open.front());
-    //         this->open.pop();
-    //     }
-
-    //     for (Node* n : copyOfOpen)
-    //     {
-    //         openVec.push_back(n->state);
-    //     }
-
-    //     for (Node* n : copyOfOpen) // Restore queue
-    //     {
-    //         this->open.push(n);
-    //     }
-    // }
-    // else
-    // {
-    //     std::vector<Node*> copyOfOpen; // Make copy of stack
-    //     while (!this->openDFS.empty())
-    //     {
-    //         copyOfOpen.push_back(this->openDFS.top());
-    //         this->openDFS.pop();
-    //     }
-
-    //     for (Node* n : copyOfOpen)
-    //     {
-    //         openVec.push_back(n->state);
-    //     }
-
-    //     for (int i = copyOfOpen.size() - 1; i > -1; i--) // restore stack
-    //     {
-    //         this->openDFS.push(copyOfOpen[i]);
-    //     }
-    // }
-
-    // return openVec;
-
     return this->open.getGridCells();
 }
 
@@ -336,18 +230,6 @@ std::vector<GridCell> SearchAI::getSolution()
 // true if found goal, else false
 bool SearchAI::done()
 {
-    // std::cout << "done() = ";
-    // if (this->usingBFS)
-    // { 
-    //     // std::cout << (foundGoal || this->open.empty()) << '\n';
-    //     return foundGoal || this->open.empty();
-    // }
-    // else
-    // {
-    //     // std::cout << (foundGoal || this->openDFS.empty()) << '\n';
-    //     return foundGoal || this->openDFS.empty();
-    // }
-
     return foundGoal || this->open.isEmpty();
 }
 
