@@ -2,12 +2,6 @@
 #include "Shader.h"
 
 
-const glm::vec3 CELL_COLORS[] = 
-{
-    glm::vec3(0.2f, 0.329f, 1.0f), // 0
-    glm::vec3(0.259f, 0.988f, 0.008f)  // 1 
-};
-
 const glm::vec3 GRID_LINES_COLOR = glm::vec3(0.1f);
 
 Renderer::Renderer()

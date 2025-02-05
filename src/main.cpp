@@ -31,6 +31,10 @@ bool animate = false;
 Grid grid;
 
 bool mapCreationMode = false;
+unsigned int selectedCellValue = 0;
+
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 800;
 
 bool initialize(GLFWwindow* &window, unsigned int width, unsigned int height);
 void processInput(GLFWwindow *window);
@@ -44,8 +48,6 @@ int main()
 {
     // Window
     GLFWwindow* window = nullptr;
-    const unsigned int SCR_WIDTH = 800;
-    const unsigned int SCR_HEIGHT = 800;
 
     if (!initialize(window, SCR_WIDTH, SCR_HEIGHT))
     {
@@ -134,7 +136,10 @@ int main()
         }
         else
         {
-
+            renderer.drawGrid(grid);
+            GridCell mouseCell = getCellThatMouseIsOn(grid, mousePos, SCR_WIDTH, SCR_HEIGHT);
+            renderer.drawCell(mouseCell, grid, CELL_COLORS[selectedCellValue]);
+            renderer.drawGridLines(grid);
         }
 
         glfwSwapBuffers(window);
@@ -244,6 +249,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             ai.step();
         }
     }
+    else
+    {
+        const glm::vec2 mousePOS (xpos, ypos); // what a POS mouse!
+        GridCell clickedCell = getCellThatMouseIsOn(grid, mousePOS, SCR_WIDTH, SCR_HEIGHT);
+        grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
+    }
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -276,6 +287,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     else
     {
-
+        if (key == GLFW_KEY_N && action == GLFW_PRESS)
+        {
+            selectedCellValue++;
+            
+            if (selectedCellValue >= COUNT_CELL_COLORS)
+            {
+                selectedCellValue = 0;
+            }
+        }
     }
 }
