@@ -44,3 +44,19 @@ public:
     std::vector<GridCell> getSolution();
     bool done();
 };
+
+class StackOrQueue
+{
+public:
+    StackOrQueue(bool isStack);
+
+    Node* pop();
+    void push(Node* node);
+    std::vector<GridCell> getGridCells();
+    bool isEmpty() const;
+
+private:
+    std::queue<Node*> queue;
+    std::stack<Node*> stack;
+    const bool isStack;
+};
