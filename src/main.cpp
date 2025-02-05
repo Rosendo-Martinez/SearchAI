@@ -22,7 +22,8 @@ unsigned int selectedPathEndpoints = 0;
 
 bool reInitAI = true;
 SearchAI ai;
-bool usingBFS = true;
+// bool usingBFS = true;
+SearchAIType aiType = BFS;
 
 float lastAnimation = 0.0f;
 const float ANIMATION_INTERVAL = 0.4f; // seconds
@@ -85,7 +86,7 @@ int main()
 
             if (reInitAI && selectedPathEndpoints == 2)
             {
-                ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, usingBFS);
+                ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, aiType);
                 reInitAI = false;
             }
         }
@@ -291,7 +292,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
         if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
         {
-            usingBFS = !usingBFS;
+            // usingBFS = !usingBFS;
+            if (aiType == BFS)
+            {
+                aiType = DFS;
+            }
+            else
+            {
+                aiType = BFS;
+            }
+
             reInitAI = true;
         }
     }

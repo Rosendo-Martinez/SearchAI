@@ -101,7 +101,7 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
     return true;
 }
 
-void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
+void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
 {
     // Free memory
     for (Node* n : closed)
@@ -123,8 +123,17 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, bool useBFS)
     this->grid = grid;
     this->foundGoal = false;
     this->goal = nullptr;
-    this->usingBFS = useBFS;
-    this->open = StackOrQueue(!useBFS); // BFS uses queue, DFS uses stack
+    // this->usingBFS = useBFS;
+    this->ai = ai;
+
+    if (ai == BFS)
+    {
+        this->open = StackOrQueue(false);
+    }
+    else if (ai == DFS)
+    {
+        this->open = StackOrQueue(true);
+    }
 
     // init. state
     Node* initial = new Node;

@@ -18,6 +18,11 @@ enum Action
     UP, DOWN, LEFT, RIGHT
 };
 
+enum SearchAIType
+{
+    DFS, BFS
+};
+
 std::vector<GridCell> searchDumb(GridCell start, GridCell end);
 
 class StackOrQueue
@@ -49,14 +54,15 @@ private:
     Grid* grid;
     Node* goal = nullptr;
     bool foundGoal = false;
-    bool usingBFS = true;
+    // bool usingBFS = true;
+    SearchAIType ai;
     unsigned int MAX_DEPTH = 7;
 
 public:
 
     SearchAI() {}
 
-    void init(GridCell start, GridCell end, Grid* grid, bool useBFS = true);
+    void init(GridCell start, GridCell end, Grid* grid, SearchAIType ai);
     void step();
 
     std::vector<GridCell> getOpen();
