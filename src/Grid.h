@@ -5,6 +5,11 @@ struct GridCell
 {
     unsigned int row;
     unsigned int col;
+
+    bool operator==(const GridCell& other) const
+    {
+        return (this->row == other.row) && (this->col == other.col);
+    }
 };
 
 class Grid

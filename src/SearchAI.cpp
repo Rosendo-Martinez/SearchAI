@@ -15,7 +15,7 @@ std::vector<GridCell> searchDumb(GridCell start, GridCell end)
     {
         solution.push_back(current);
 
-        if (current.row == end.row && current.col == end.col) // goal found
+        if (current == end) // goal found
         {
             return solution;
         }
@@ -62,6 +62,16 @@ GridCell doAction(GridCell state, Action act)
     return state;
 }
 
+Node* expand(Node* parent, Action act)
+{
+    Node* child = new Node;
+    child->state = doAction(parent->state, act);
+    child->parent = parent;
+    child->depth = parent->depth + 1;
+    
+    return child;
+}
+
 bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid, const std::vector<GridCell>& open)
 {
     GridCell nextState = doAction(state, act);
@@ -82,17 +92,17 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
         return false;
     }
 
-    for (const auto& n : closed) // in closed list
+    for (const auto& aNode : closed) // in closed list
     {
-        if (n->state.col == nextState.col && n->state.row == nextState.row)
+        if (aNode->state == nextState)
         {
             return false;
         }
     }
 
-    for (GridCell c : open) // in open list
+    for (GridCell aCell : open) // in open list
     {
-        if (c.col == nextState.col && c.row == nextState.row)
+        if (aCell == nextState)
         {
             return false;
         }
@@ -123,7 +133,6 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
     this->grid = grid;
     this->foundGoal = false;
     this->goal = nullptr;
-    // this->usingBFS = useBFS;
     this->ai = ai;
     this->CUR_MAX_DEPTH = 0;
 
@@ -131,7 +140,7 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
     {
         this->open = StackOrQueue(false);
     }
-    else if (ai == DFS)
+    else if (ai == DFS || ai == ID_DFS)
     {
         this->open = StackOrQueue(true);
     }
@@ -146,55 +155,29 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
 
 void SearchAI::step()
 {
-    // std::cout << "STEP\n";
-    if (this->open.isEmpty() && this->ai == ID_DFS && this->CUR_MAX_DEPTH < this->MAX_DEPTH)
+    if (this->done()) // Found solution or no possible solution
     {
-        this->CUR_MAX_DEPTH++;
-
-        // Free memory
-        for (Node* n : closed)
-        {
-            delete n;
-        }
-        this->closed.clear();
-        while (!open.isEmpty())
-        {
-            Node* n = open.pop();
-
-            delete n;
-        }
-
-        this->open = StackOrQueue(true);
-
-        // init. state
-        Node* initial = new Node;
-        initial->parent = nullptr;
-        initial->state = start;
-        initial->depth = 0;
-        this->open.push(initial);
-
         return;
     }
 
-
-    if (this->done()) // no solution / done
+    if (this->open.isEmpty()) // increase depth for ID-DFS
     {
-        // std::cout << "  Open Empty or Found Goal\n";
-        return;
+        unsigned int temp = this->CUR_MAX_DEPTH;
+        this->init(this->start, this->end, this->grid, ID_DFS); // reset
+        this->CUR_MAX_DEPTH = temp + 1;
     }
 
-    Node * n = this->open.pop();
-    closed.push_back(n);
+    Node * current = this->open.pop();
+    closed.push_back(current);
 
-    if (n->state.row == this->end.row && n->state.col == this->end.col) // at goal
+    if (this->end == current->state) // at goal
     {
-        // std::cout << "  At goal\n";
         this->foundGoal = true;
-        this->goal = n;
+        this->goal = current;
         return;
     }
 
-    if (n->depth == CUR_MAX_DEPTH) // at max depth
+    if (current->depth == CUR_MAX_DEPTH) // at max depth
     {
         return;
     }
@@ -202,42 +185,22 @@ void SearchAI::step()
     // Expand node
 
     const std::vector<GridCell> openList = this->getOpen();
-    if (isValidAction(n->state, UP, closed, *this->grid, openList))
+    if (isValidAction(current->state, UP, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Up\n";
-        Node* child = new Node;
-        child->state = doAction(n->state, UP);
-        child->parent = n;
-        child->depth = n->depth + 1;
-        this->open.push(child);
+        this->open.push(expand(current, UP));
     }
-    if (isValidAction(n->state, DOWN, closed, *this->grid, openList))
+    if (isValidAction(current->state, DOWN, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Down\n";
-        Node* child = new Node;
-        child->state = doAction(n->state, DOWN);
-        child->parent = n;
-        child->depth = n->depth + 1;
-        this->open.push(child);
+        this->open.push(expand(current, DOWN));
     }
-    if (isValidAction(n->state, LEFT, closed, *this->grid, openList))
+    if (isValidAction(current->state, LEFT, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Left\n";
-        Node* child = new Node;
-        child->state = doAction(n->state, LEFT);
-        child->parent = n;
-        child->depth = n->depth + 1;
-        this->open.push(child);
+        this->open.push(expand(current, LEFT));
     }
-    if (isValidAction(n->state, RIGHT, closed, *this->grid, openList))
+    if (isValidAction(current->state, RIGHT, closed, *this->grid, openList))
     {
-        // std::cout << "  Do Action Right\n";
-        Node* child = new Node;
-        child->state = doAction(n->state, RIGHT);
-        child->parent = n;
-        child->depth = n->depth + 1;
-        this->open.push(child);
-    }   
+        this->open.push(expand(current, RIGHT));
+    }
 }
 
 std::vector<GridCell> SearchAI::getOpen()
