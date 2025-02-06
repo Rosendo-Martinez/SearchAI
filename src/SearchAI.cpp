@@ -125,6 +125,7 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
     this->goal = nullptr;
     // this->usingBFS = useBFS;
     this->ai = ai;
+    this->CUR_MAX_DEPTH = 0;
 
     if (ai == BFS)
     {
@@ -146,6 +147,35 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
 void SearchAI::step()
 {
     // std::cout << "STEP\n";
+    if (this->open.isEmpty() && this->ai == ID_DFS && this->CUR_MAX_DEPTH < this->MAX_DEPTH)
+    {
+        this->CUR_MAX_DEPTH++;
+
+        // Free memory
+        for (Node* n : closed)
+        {
+            delete n;
+        }
+        this->closed.clear();
+        while (!open.isEmpty())
+        {
+            Node* n = open.pop();
+
+            delete n;
+        }
+
+        this->open = StackOrQueue(true);
+
+        // init. state
+        Node* initial = new Node;
+        initial->parent = nullptr;
+        initial->state = start;
+        initial->depth = 0;
+        this->open.push(initial);
+
+        return;
+    }
+
 
     if (this->done()) // no solution / done
     {
@@ -164,10 +194,10 @@ void SearchAI::step()
         return;
     }
 
-    // if (n->depth == MAX_DEPTH) // at max depth
-    // {
-    //     return;
-    // }
+    if (n->depth == CUR_MAX_DEPTH) // at max depth
+    {
+        return;
+    }
 
     // Expand node
 
@@ -249,7 +279,14 @@ std::vector<GridCell> SearchAI::getSolution()
 // true if found goal, else false
 bool SearchAI::done()
 {
-    return foundGoal || this->open.isEmpty();
+    if (this->ai == ID_DFS)
+    {
+        return foundGoal || (this->CUR_MAX_DEPTH == this->MAX_DEPTH && this->open.isEmpty());
+    }
+    else
+    {
+        return foundGoal || this->open.isEmpty();
+    }
 }
 
 StackOrQueue::StackOrQueue()

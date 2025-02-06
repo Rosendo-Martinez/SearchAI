@@ -20,7 +20,7 @@ enum Action
 
 enum SearchAIType
 {
-    DFS, BFS
+    DFS, BFS, ID_DFS
 };
 
 std::vector<GridCell> searchDumb(GridCell start, GridCell end);
@@ -56,7 +56,8 @@ private:
     bool foundGoal = false;
     // bool usingBFS = true;
     SearchAIType ai;
-    unsigned int MAX_DEPTH = 7;
+    unsigned int MAX_DEPTH = 100;
+    unsigned int CUR_MAX_DEPTH = 0;
 
 public:
 

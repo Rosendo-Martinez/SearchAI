@@ -23,10 +23,10 @@ unsigned int selectedPathEndpoints = 0;
 bool reInitAI = true;
 SearchAI ai;
 // bool usingBFS = true;
-SearchAIType aiType = BFS;
+SearchAIType aiType = ID_DFS;
 
 float lastAnimation = 0.0f;
-const float ANIMATION_INTERVAL = 0.4f; // seconds
+const float ANIMATION_INTERVAL = 0.2f; // seconds
 bool animate = false;
 
 Grid grid;
@@ -47,6 +47,7 @@ GridCell getCellThatMouseIsOn(Grid& grid,const glm::vec2& mousePos, float gridWi
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void printGrid();
 
 int main()
 {
@@ -68,8 +69,10 @@ int main()
     renderer.GRID_WIDTH = SCR_WIDTH;
 
     initializeGridData();
-    grid.changeGrid(gridData->rows, gridData->cols);
-    loadGrid(grid, gridData->rawData);
+    // grid.changeGrid(gridData->rows, gridData->cols);
+    // loadGrid(grid, gridData->rawData);
+    grid.changeGrid(GRID_RAW_DATA[0]->rows, GRID_RAW_DATA[0]->cols);
+    loadGrid(grid, GRID_RAW_DATA[0]->rawData);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -229,7 +232,16 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
     {
         const glm::vec2 mousePOS (xpos, ypos); // what a POS mouse!
         GridCell clickedCell = getCellThatMouseIsOn(grid, mousePOS, SCR_WIDTH, SCR_HEIGHT);
-        grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
+
+        if (
+            clickedCell.row >= 0 && 
+            clickedCell.row < grid.getNumberOfRows() &&
+            clickedCell.col >= 0 &&
+            clickedCell.col < grid.getNumberOfColumns()
+        )
+        {
+            grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
+        }
     }
 }
 
@@ -260,12 +272,20 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             ai.step();
         }
     }
-    // else
-    // {
-    //     const glm::vec2 mousePOS (xpos, ypos); // what a POS mouse!
-    //     GridCell clickedCell = getCellThatMouseIsOn(grid, mousePOS, SCR_WIDTH, SCR_HEIGHT);
-    //     grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
-    // }
+    else
+    {
+        const glm::vec2 mousePOS (xpos, ypos); // what a POS mouse!
+        GridCell clickedCell = getCellThatMouseIsOn(grid, mousePOS, SCR_WIDTH, SCR_HEIGHT);
+        if (
+            clickedCell.row >= 0 && 
+            clickedCell.row < grid.getNumberOfRows() &&
+            clickedCell.col >= 0 &&
+            clickedCell.col < grid.getNumberOfColumns()
+        )
+        {
+            grid.set(clickedCell.row, clickedCell.col, selectedCellValue);
+        }
+    }
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -336,5 +356,28 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
             grid.changeGrid(GRID_DENSITIES[selectedGridDensity], GRID_DENSITIES[selectedGridDensity]);
         }
+        if (key == GLFW_KEY_P && action == GLFW_PRESS)
+        {
+            printGrid();
+        }
+        if (key == GLFW_KEY_C && action == GLFW_PRESS)
+        {
+            grid.clear(selectedCellValue);
+        }
+    }
+}
+
+void printGrid()
+{
+    std::cout << "Rows: " << grid.getNumberOfRows() << '\n';
+    std::cout << "Cols: " << grid.getNumberOfColumns() << '\n';
+
+    for (unsigned int row = 0; row < grid.getNumberOfRows(); row++)
+    {
+        for (unsigned int col = 0; col < grid.getNumberOfColumns(); col++)
+        {
+            std::cout << grid.get(row, col) << ' ';
+        }
+        std::cout << '\n';
     }
 }

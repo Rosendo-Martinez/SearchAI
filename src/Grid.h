@@ -19,6 +19,7 @@ public:
     void set(unsigned int i, unsigned int j, unsigned int newValue);
     unsigned int getNumberOfRows() const;
     unsigned int getNumberOfColumns() const;
+    void clear(unsigned int value);
 
 private:
     unsigned int** grid = nullptr;
@@ -26,7 +27,6 @@ private:
     unsigned int columns = 0; 
 
     void free();
-    void clear(unsigned int value);
 };
 
 #endif

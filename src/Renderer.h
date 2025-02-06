@@ -3,12 +3,13 @@
 #include "Grid.h"
 #include <glm/glm.hpp>
 
-const unsigned int COUNT_CELL_COLORS = 3;
+const unsigned int COUNT_CELL_COLORS = 4;
 const glm::vec3 CELL_COLORS[] = 
 {
     glm::vec3(0.2f, 0.329f, 1.0f), // 0
     glm::vec3(0.259f, 0.988f, 0.008f),  // 1 
-    glm::vec3(0.467f, 0.467f, 0.467f) // 2
+    glm::vec3(0.467f, 0.467f, 0.467f), // 2
+    glm::vec3(0.592, 0.349, 0.251),
 };
 
 class Renderer
