@@ -323,14 +323,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             if (aiType == BFS)
             {
                 aiType = DFS;
+                std::cout << "Search AI: DFS\n";
             }
             else if (aiType == DFS)
             {
                 aiType = ID_DFS;
+                std::cout << "Search AI: ID-DFS\n";
             }
             else
             {
                 aiType = BFS;
+                std::cout << "Search AI: BFS\n";
             }
 
             reInitAI = true;
