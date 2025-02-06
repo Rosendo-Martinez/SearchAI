@@ -157,7 +157,6 @@ void SearchAI::step()
 {
     if (this->done()) // Found solution or no possible solution
     {
-        std::cout << "DONE!\n";
         return;
     }
 

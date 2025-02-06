@@ -22,7 +22,6 @@ unsigned int selectedPathEndpoints = 0;
 
 bool reInitAI = true;
 SearchAI ai;
-// bool usingBFS = true;
 SearchAIType aiType = BFS;
 
 float lastAnimation = 0.0f;
@@ -70,8 +69,6 @@ int main()
     renderer.GRID_WIDTH = SCR_WIDTH;
 
     initializeGridData();
-    // grid.changeGrid(gridData->rows, gridData->cols);
-    // loadGrid(grid, gridData->rawData);
     grid.changeGrid(GRID_RAW_DATA[0]->rows, GRID_RAW_DATA[0]->cols);
     loadGrid(grid, GRID_RAW_DATA[0]->rawData);
 
@@ -93,10 +90,6 @@ int main()
                 ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, aiType);
                 reInitAI = false;
             }
-        }
-        else
-        {
-
         }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -270,7 +263,17 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
         if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
         {
-            ai.step();
+            if (animate)
+            {
+                while (!ai.done())
+                {
+                    ai.step();
+                }
+            }
+            else
+            {
+                ai.step();
+            }
         }
     }
     else
@@ -294,6 +297,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_M && action == GLFW_PRESS)
     {
         mapCreationMode = !mapCreationMode;
+        if (mapCreationMode)
+        {
+            selectedPathEndpoints = 0;
+        }
         std::cout << "Map creation mode: " << (mapCreationMode ? "ON" : "OFF") << '\n';
     }
 
