@@ -157,6 +157,7 @@ void SearchAI::step()
 {
     if (this->done()) // Found solution or no possible solution
     {
+        std::cout << "DONE!\n";
         return;
     }
 
@@ -177,7 +178,7 @@ void SearchAI::step()
         return;
     }
 
-    if (current->depth == CUR_MAX_DEPTH) // at max depth
+    if (this->ai == ID_DFS && current->depth == CUR_MAX_DEPTH) // at max depth
     {
         return;
     }

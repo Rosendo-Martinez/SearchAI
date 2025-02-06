@@ -23,7 +23,7 @@ unsigned int selectedPathEndpoints = 0;
 bool reInitAI = true;
 SearchAI ai;
 // bool usingBFS = true;
-SearchAIType aiType = ID_DFS;
+SearchAIType aiType = BFS;
 
 float lastAnimation = 0.0f;
 const float ANIMATION_INTERVAL = 0.2f; // seconds
@@ -313,10 +313,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
         if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
         {
-            // usingBFS = !usingBFS;
             if (aiType == BFS)
             {
                 aiType = DFS;
+            }
+            else if (aiType == DFS)
+            {
+                aiType = ID_DFS;
             }
             else
             {
