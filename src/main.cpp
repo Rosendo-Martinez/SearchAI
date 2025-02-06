@@ -36,6 +36,7 @@ unsigned int selectedCellValue = 0;
 const unsigned int COUNT_GRID_DENSITIES = 5;
 const unsigned int GRID_DENSITIES[] = { 16, 32, 64, 128, 256 };
 unsigned int selectedGridDensity = 0;
+unsigned int selectedGridPreMadeMap = 0;
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -363,6 +364,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         if (key == GLFW_KEY_C && action == GLFW_PRESS)
         {
             grid.clear(selectedCellValue);
+        }
+        if (key == GLFW_KEY_B && action == GLFW_PRESS)
+        {
+            selectedGridPreMadeMap++;
+            if (selectedGridPreMadeMap >= GRID_RAW_DATA_SIZE)
+            {
+                selectedGridPreMadeMap = 0;
+            }
+
+            grid.changeGrid(GRID_RAW_DATA[selectedGridPreMadeMap]->rows, GRID_RAW_DATA[selectedGridPreMadeMap]->cols);
+            loadGrid(grid, GRID_RAW_DATA[selectedGridPreMadeMap]->rawData);
         }
     }
 }
