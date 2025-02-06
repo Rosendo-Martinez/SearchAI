@@ -2,6 +2,7 @@
 #include <queue>
 #include <iostream>
 #include <stack>
+#include <limits>
 
 #include "Grid.h"
 
@@ -46,17 +47,14 @@ class SearchAI
 {
 private:
     std::vector<Node*> closed;
-    // std::queue<Node*> open;
-    // std::stack<Node*> openDFS;
     StackOrQueue open;
     GridCell start;
     GridCell end;
     Grid* grid;
     Node* goal = nullptr;
     bool foundGoal = false;
-    // bool usingBFS = true;
     SearchAIType ai;
-    unsigned int MAX_DEPTH = 100;
+    const unsigned int MAX_DEPTH = std::numeric_limits<unsigned int>::max();
     unsigned int CUR_MAX_DEPTH = 0;
 
 public:
