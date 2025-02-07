@@ -58,6 +58,7 @@ private:
     SearchAIType ai;
     const unsigned int MAX_DEPTH = std::numeric_limits<unsigned int>::max();
     unsigned int CUR_MAX_DEPTH = 0;
+    void expand(Node* node, Action act, const std::vector<Node*>& openVec);
 
 public:
 

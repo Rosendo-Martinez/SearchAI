@@ -62,54 +62,28 @@ GridCell doAction(GridCell state, Action act)
     return state;
 }
 
-Node* expand(Node* parent, Action act)
+Node expandHelper(Node* parent, Action act)
 {
-    Node* child = new Node;
-    child->state = doAction(parent->state, act);
-    child->parent = parent;
-    child->depth = parent->depth + 1;
+    Node child;
+    child.state = doAction(parent->state, act);
+    child.parent = parent;
+    child.depth = parent->depth + 1;
     
     return child;
 }
 
-bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid, const std::vector<Node*>& open, unsigned int depth)
+bool isLegalAction(const Grid* grid, GridCell state, Action act)
 {
     GridCell nextState = doAction(state, act);
 
-    // if // out of bounds
-    // (
-    //     nextState.col < 0 ||
-    //     nextState.row < 0 ||
-    //     nextState.col >= grid.getNumberOfColumns() ||
-    //     nextState.row >= grid.getNumberOfRows()
-    // )
-    // {
-    //     return false;
-    // }
-    if (grid.outOfBounds(nextState))
+    if (grid->outOfBounds(nextState))
     {
         return false;
     }
 
-    if (grid.get(state.row, state.col) != grid.get(nextState.row, nextState.col)) // same value/color
+    if (grid->get(state.row, state.col) != grid->get(nextState.row, nextState.col)) // same value/color
     {
         return false;
-    }
-
-    for (const auto& aNode : closed) // in closed list
-    {
-        if (aNode->state == nextState && aNode->depth <= depth + 1)
-        {
-            return false;
-        }
-    }
-
-    for (Node* node : open) // in open list
-    {
-        if (node->state == nextState)
-        {
-            return false;
-        }
     }
 
     return true;
@@ -157,6 +131,43 @@ void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
     this->open.push(initial);
 }
 
+void SearchAI::expand(Node* node, Action act, const std::vector<Node*>& openVec)
+{
+    if (isLegalAction(this->grid, node->state, act))
+    {
+        Node child = expandHelper(node, act);
+
+        // Check if is in closed list already
+        for (int i = 0; i < this->closed.size(); i++)
+        {
+            if (this->closed[i]->state == child.state) // same state
+            {
+                if (this->closed[i]->depth <= child.depth)
+                {
+                    return;
+                }
+            }
+        }
+
+        // Check if state already in open
+        for (int i = 0; i < openVec.size(); i++)
+        {
+            if (openVec[i]->state == child.state)
+            {
+                return;
+            }
+        }
+
+        // Add to open.
+        Node * toAdd = new Node();
+        toAdd->depth = child.depth;
+        toAdd->parent = child.parent;
+        toAdd->state = child.state;
+
+        this->open.push(toAdd);
+    }
+}
+
 void SearchAI::step()
 {
     if (this->done()) // Found solution or no possible solution
@@ -189,22 +200,10 @@ void SearchAI::step()
     // Expand node
 
     const std::vector<Node*> openList = this->open.getNodes();
-    if (isValidAction(current->state, UP, closed, *this->grid, openList, current->depth))
-    {
-        this->open.push(expand(current, UP));
-    }
-    if (isValidAction(current->state, DOWN, closed, *this->grid, openList, current->depth))
-    {
-        this->open.push(expand(current, DOWN));
-    }
-    if (isValidAction(current->state, LEFT, closed, *this->grid, openList, current->depth))
-    {
-        this->open.push(expand(current, LEFT));
-    }
-    if (isValidAction(current->state, RIGHT, closed, *this->grid, openList, current->depth))
-    {
-        this->open.push(expand(current, RIGHT));
-    }
+    this->expand(current, UP, openList);
+    this->expand(current, DOWN, openList);
+    this->expand(current, LEFT, openList);
+    this->expand(current, RIGHT, openList);
 
     std::cout << "Open size: " << this->open.size() << '\n';
     std::cout << "Closed size: " << this->closed.size() << '\n';
