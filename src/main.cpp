@@ -101,15 +101,15 @@ int main()
 
             if (selectedPathEndpoints == 2)
             {
-                std::vector<GridCell> openList = ai.getOpen();
-                for (GridCell c : openList)
-                {
-                    renderer.drawCell(c, grid, OPEN_CELL);
-                }
                 std::vector<GridCell> closedList = ai.getClosed();
                 for (GridCell c : closedList)
                 {
                     renderer.drawCell(c, grid, CLOSED_CELL);
+                }
+                std::vector<GridCell> openList = ai.getOpen();
+                for (GridCell c : openList)
+                {
+                    renderer.drawCell(c, grid, OPEN_CELL);
                 }
                 std::vector<GridCell> solution = ai.getSolution();
                 for (GridCell c : solution)
@@ -265,7 +265,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         {
             if (animate)
             {
-                while (!ai.done())
+                float END_TIME = glfwGetTime() + 1.0f;
+                while (!ai.done() && END_TIME >= glfwGetTime())
                 {
                     ai.step();
                 }

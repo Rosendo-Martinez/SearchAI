@@ -36,6 +36,7 @@ public:
     void push(Node* node);
     std::vector<GridCell> getGridCells();
     bool isEmpty() const;
+    unsigned int size();
 
 private:
     std::queue<Node*> queue;

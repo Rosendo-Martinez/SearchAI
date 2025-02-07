@@ -72,7 +72,7 @@ Node* expand(Node* parent, Action act)
     return child;
 }
 
-bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid, const std::vector<GridCell>& open)
+bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid, const std::vector<GridCell>& open, unsigned int depth)
 {
     GridCell nextState = doAction(state, act);
 
@@ -94,7 +94,7 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
 
     for (const auto& aNode : closed) // in closed list
     {
-        if (aNode->state == nextState)
+        if (aNode->state == nextState && aNode->depth <= depth + 1)
         {
             return false;
         }
@@ -162,6 +162,10 @@ void SearchAI::step()
 
     if (this->open.isEmpty()) // increase depth for ID-DFS
     {
+        std::cout << "Reset ID-DFS\n";
+        std::cout << "Open size: " << this->open.size() << '\n';
+        std::cout << "Closed size: " << this->closed.size() << '\n';
+
         unsigned int temp = this->CUR_MAX_DEPTH;
         this->init(this->start, this->end, this->grid, ID_DFS); // reset
         this->CUR_MAX_DEPTH = temp + 1;
@@ -185,19 +189,19 @@ void SearchAI::step()
     // Expand node
 
     const std::vector<GridCell> openList = this->getOpen();
-    if (isValidAction(current->state, UP, closed, *this->grid, openList))
+    if (isValidAction(current->state, UP, closed, *this->grid, openList, current->depth))
     {
         this->open.push(expand(current, UP));
     }
-    if (isValidAction(current->state, DOWN, closed, *this->grid, openList))
+    if (isValidAction(current->state, DOWN, closed, *this->grid, openList, current->depth))
     {
         this->open.push(expand(current, DOWN));
     }
-    if (isValidAction(current->state, LEFT, closed, *this->grid, openList))
+    if (isValidAction(current->state, LEFT, closed, *this->grid, openList, current->depth))
     {
         this->open.push(expand(current, LEFT));
     }
-    if (isValidAction(current->state, RIGHT, closed, *this->grid, openList))
+    if (isValidAction(current->state, RIGHT, closed, *this->grid, openList, current->depth))
     {
         this->open.push(expand(current, RIGHT));
     }
@@ -336,4 +340,9 @@ std::vector<GridCell> StackOrQueue::getGridCells()
     }
 
     return gridCells;
+}
+
+unsigned int StackOrQueue::size()
+{
+    return (this->isStack ? this->stack.size() : this->queue.size());
 }
