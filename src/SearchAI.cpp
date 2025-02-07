@@ -162,10 +162,6 @@ void SearchAI::step()
 
     if (this->open.isEmpty()) // increase depth for ID-DFS
     {
-        std::cout << "Reset ID-DFS\n";
-        std::cout << "Open size: " << this->open.size() << '\n';
-        std::cout << "Closed size: " << this->closed.size() << '\n';
-
         unsigned int temp = this->CUR_MAX_DEPTH;
         this->init(this->start, this->end, this->grid, ID_DFS); // reset
         this->CUR_MAX_DEPTH = temp + 1;
@@ -205,6 +201,9 @@ void SearchAI::step()
     {
         this->open.push(expand(current, RIGHT));
     }
+
+    std::cout << "Open size: " << this->open.size() << '\n';
+    std::cout << "Closed size: " << this->closed.size() << '\n';
 }
 
 std::vector<GridCell> SearchAI::getOpen()
