@@ -37,6 +37,7 @@ public:
     std::vector<GridCell> getGridCells();
     bool isEmpty() const;
     unsigned int size();
+    std::vector<Node*> getNodes();
 
 private:
     std::queue<Node*> queue;

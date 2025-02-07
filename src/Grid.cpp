@@ -98,3 +98,13 @@ void Grid::clear(unsigned int value)
         }
     }
 }
+
+bool Grid::outOfBounds(GridCell cell) const
+{
+    return (
+        cell.col < 0 ||
+        cell.row < 0 ||
+        cell.col >= columns ||
+        cell.row >= rows
+    );
+}

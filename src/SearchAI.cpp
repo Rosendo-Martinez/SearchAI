@@ -72,17 +72,21 @@ Node* expand(Node* parent, Action act)
     return child;
 }
 
-bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid, const std::vector<GridCell>& open, unsigned int depth)
+bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed, const Grid& grid, const std::vector<Node*>& open, unsigned int depth)
 {
     GridCell nextState = doAction(state, act);
 
-    if // out of bounds
-    (
-        nextState.col < 0 ||
-        nextState.row < 0 ||
-        nextState.col >= grid.getNumberOfColumns() ||
-        nextState.row >= grid.getNumberOfRows()
-    )
+    // if // out of bounds
+    // (
+    //     nextState.col < 0 ||
+    //     nextState.row < 0 ||
+    //     nextState.col >= grid.getNumberOfColumns() ||
+    //     nextState.row >= grid.getNumberOfRows()
+    // )
+    // {
+    //     return false;
+    // }
+    if (grid.outOfBounds(nextState))
     {
         return false;
     }
@@ -100,9 +104,9 @@ bool isValidAction(GridCell state, Action act, const std::vector<Node*>& closed,
         }
     }
 
-    for (GridCell aCell : open) // in open list
+    for (Node* node : open) // in open list
     {
-        if (aCell == nextState)
+        if (node->state == nextState)
         {
             return false;
         }
@@ -184,7 +188,7 @@ void SearchAI::step()
 
     // Expand node
 
-    const std::vector<GridCell> openList = this->getOpen();
+    const std::vector<Node*> openList = this->open.getNodes();
     if (isValidAction(current->state, UP, closed, *this->grid, openList, current->depth))
     {
         this->open.push(expand(current, UP));
@@ -344,4 +348,32 @@ std::vector<GridCell> StackOrQueue::getGridCells()
 unsigned int StackOrQueue::size()
 {
     return (this->isStack ? this->stack.size() : this->queue.size());
+}
+
+std::vector<Node*> StackOrQueue::getNodes()
+{
+    // Make copy of stack/queue
+    std::vector<Node*> copy;
+    while (!this->isEmpty())
+    {
+        copy.push_back(this->pop());
+    }
+
+    // Restore stack/queue
+    if (this->isStack)
+    {
+        for (int i = copy.size() - 1; i > -1; i--)
+        {
+            this->push(copy[i]);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < copy.size(); i++)
+        {
+            this->push(copy[i]);
+        }
+    }
+
+    return copy;
 }
