@@ -1,45 +1,45 @@
 #include "SearchAI.h"
 
 
-/**
- * Very simple search AI. It just goes straight to the goal.
- * 
- * Solution returned backwards in vector.
- */
-std::vector<GridCell> searchDumb(GridCell start, GridCell end)
-{
-    std::vector<GridCell> solution;
+// /**
+//  * Very simple search AI. It just goes straight to the goal.
+//  * 
+//  * Solution returned backwards in vector.
+//  */
+// std::vector<GridCell> searchDumb(GridCell start, GridCell end)
+// {
+//     std::vector<GridCell> solution;
 
-    GridCell current = start;
-    while (true)
-    {
-        solution.push_back(current);
+//     GridCell current = start;
+//     while (true)
+//     {
+//         solution.push_back(current);
 
-        if (current == end) // goal found
-        {
-            return solution;
-        }
+//         if (current == end) // goal found
+//         {
+//             return solution;
+//         }
 
-        // Move to next grid cell
+//         // Move to next grid cell
 
-        if (current.col < end.col)
-        {
-            current.col++;
-        }
-        else if (current.col > end.col)
-        {
-            current.col--;
-        }
-        else if (current.row < end.row)
-        {
-            current.row++;
-        }
-        else // current.row > end.row
-        {
-            current.row--;
-        }
-    }
-}
+//         if (current.col < end.col)
+//         {
+//             current.col++;
+//         }
+//         else if (current.col > end.col)
+//         {
+//             current.col--;
+//         }
+//         else if (current.row < end.row)
+//         {
+//             current.row++;
+//         }
+//         else // current.row > end.row
+//         {
+//             current.row--;
+//         }
+//     }
+// }
 
 GridCell doAction(GridCell state, Action act)
 {
@@ -89,290 +89,290 @@ bool isLegalAction(const Grid* grid, GridCell state, Action act)
     return true;
 }
 
-void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
-{
-    // Free memory
-    for (Node* n : closed)
-    {
-        delete n;
-    }
-    this->closed.clear();
-    while (!open.isEmpty())
-    {
-        Node* n = open.pop();
+// void SearchAI::init(GridCell start, GridCell end, Grid* grid, SearchAIType ai)
+// {
+//     // Free memory
+//     for (Node* n : closed)
+//     {
+//         delete n;
+//     }
+//     this->closed.clear();
+//     while (!open.isEmpty())
+//     {
+//         Node* n = open.pop();
 
-        delete n;
-    }
+//         delete n;
+//     }
 
-    // init.
+//     // init.
 
-    this->start = start;
-    this->end = end;
-    this->grid = grid;
-    this->foundGoal = false;
-    this->goal = nullptr;
-    this->ai = ai;
-    this->CUR_MAX_DEPTH = 0;
+//     this->start = start;
+//     this->end = end;
+//     this->grid = grid;
+//     this->foundGoal = false;
+//     this->goal = nullptr;
+//     this->ai = ai;
+//     this->CUR_MAX_DEPTH = 0;
 
-    if (ai == BFS)
-    {
-        this->open = StackOrQueue(false);
-    }
-    else if (ai == DFS || ai == ID_DFS)
-    {
-        this->open = StackOrQueue(true);
-    }
+//     if (ai == BFS)
+//     {
+//         this->open = StackOrQueue(false);
+//     }
+//     else if (ai == DFS || ai == ID_DFS)
+//     {
+//         this->open = StackOrQueue(true);
+//     }
 
-    // init. state
-    Node* initial = new Node;
-    initial->parent = nullptr;
-    initial->state = start;
-    initial->depth = 0;
-    this->open.push(initial);
-}
+//     // init. state
+//     Node* initial = new Node;
+//     initial->parent = nullptr;
+//     initial->state = start;
+//     initial->depth = 0;
+//     this->open.push(initial);
+// }
 
-void SearchAI::expand(Node* node, Action act, const std::vector<Node*>& openVec)
-{
-    if (isLegalAction(this->grid, node->state, act))
-    {
-        Node child = expandHelper(node, act);
+// void SearchAI::expand(Node* node, Action act, const std::vector<Node*>& openVec)
+// {
+//     if (isLegalAction(this->grid, node->state, act))
+//     {
+//         Node child = expandHelper(node, act);
 
-        // Check if is in closed list already
-        for (int i = 0; i < this->closed.size(); i++)
-        {
-            if (this->closed[i]->state == child.state) // same state
-            {
-                if (this->closed[i]->depth <= child.depth)
-                {
-                    return;
-                }
-            }
-        }
+//         // Check if is in closed list already
+//         for (int i = 0; i < this->closed.size(); i++)
+//         {
+//             if (this->closed[i]->state == child.state) // same state
+//             {
+//                 if (this->closed[i]->depth <= child.depth)
+//                 {
+//                     return;
+//                 }
+//             }
+//         }
 
-        // Check if state already in open
-        for (int i = 0; i < openVec.size(); i++)
-        {
-            if (openVec[i]->state == child.state)
-            {
-                return;
-            }
-        }
+//         // Check if state already in open
+//         for (int i = 0; i < openVec.size(); i++)
+//         {
+//             if (openVec[i]->state == child.state)
+//             {
+//                 return;
+//             }
+//         }
 
-        // Add to open.
-        Node * toAdd = new Node();
-        toAdd->depth = child.depth;
-        toAdd->parent = child.parent;
-        toAdd->state = child.state;
+//         // Add to open.
+//         Node * toAdd = new Node();
+//         toAdd->depth = child.depth;
+//         toAdd->parent = child.parent;
+//         toAdd->state = child.state;
 
-        this->open.push(toAdd);
-    }
-}
+//         this->open.push(toAdd);
+//     }
+// }
 
-void SearchAI::step()
-{
-    if (this->done()) // Found solution or no possible solution
-    {
-        return;
-    }
+// void SearchAI::step()
+// {
+//     if (this->done()) // Found solution or no possible solution
+//     {
+//         return;
+//     }
 
-    if (this->open.isEmpty()) // increase depth for ID-DFS
-    {
-        unsigned int temp = this->CUR_MAX_DEPTH;
-        this->init(this->start, this->end, this->grid, ID_DFS); // reset
-        this->CUR_MAX_DEPTH = temp + 1;
-    }
+//     if (this->open.isEmpty()) // increase depth for ID-DFS
+//     {
+//         unsigned int temp = this->CUR_MAX_DEPTH;
+//         this->init(this->start, this->end, this->grid, ID_DFS); // reset
+//         this->CUR_MAX_DEPTH = temp + 1;
+//     }
 
-    Node * current = this->open.pop();
-    closed.push_back(current);
+//     Node * current = this->open.pop();
+//     closed.push_back(current);
 
-    if (this->end == current->state) // at goal
-    {
-        this->foundGoal = true;
-        this->goal = current;
-        return;
-    }
+//     if (this->end == current->state) // at goal
+//     {
+//         this->foundGoal = true;
+//         this->goal = current;
+//         return;
+//     }
 
-    if (this->ai == ID_DFS && current->depth == CUR_MAX_DEPTH) // at max depth
-    {
-        return;
-    }
+//     if (this->ai == ID_DFS && current->depth == CUR_MAX_DEPTH) // at max depth
+//     {
+//         return;
+//     }
 
-    // Expand node
+//     // Expand node
 
-    const std::vector<Node*> openList = this->open.getNodes();
-    this->expand(current, UP, openList);
-    this->expand(current, DOWN, openList);
-    this->expand(current, LEFT, openList);
-    this->expand(current, RIGHT, openList);
+//     const std::vector<Node*> openList = this->open.getNodes();
+//     this->expand(current, UP, openList);
+//     this->expand(current, DOWN, openList);
+//     this->expand(current, LEFT, openList);
+//     this->expand(current, RIGHT, openList);
 
-    std::cout << "Open size: " << this->open.size() << '\n';
-    std::cout << "Closed size: " << this->closed.size() << '\n';
-}
+//     std::cout << "Open size: " << this->open.size() << '\n';
+//     std::cout << "Closed size: " << this->closed.size() << '\n';
+// }
 
-std::vector<GridCell> SearchAI::getOpen()
-{
-    return this->open.getGridCells();
-}
+// std::vector<GridCell> SearchAI::getOpen()
+// {
+//     return this->open.getGridCells();
+// }
 
-std::vector<GridCell> SearchAI::getClosed()
-{
-    std::vector<GridCell> toReturn;
+// std::vector<GridCell> SearchAI::getClosed()
+// {
+//     std::vector<GridCell> toReturn;
 
-    for (Node* n : this->closed)
-    {
-        toReturn.push_back(n->state);
-    }
+//     for (Node* n : this->closed)
+//     {
+//         toReturn.push_back(n->state);
+//     }
 
-    return toReturn;
-}
+//     return toReturn;
+// }
 
-std::vector<GridCell> SearchAI::getSolution()
-{
-    std::vector<GridCell> sol;
+// std::vector<GridCell> SearchAI::getSolution()
+// {
+//     std::vector<GridCell> sol;
 
-    if (!foundGoal) // no solution 
-    {
-        return sol;
-    }
+//     if (!foundGoal) // no solution 
+//     {
+//         return sol;
+//     }
 
-    Node* cur = this->goal;
-    while (cur != nullptr)
-    {
-        sol.push_back(cur->state);
-        cur = cur->parent;
-    }
+//     Node* cur = this->goal;
+//     while (cur != nullptr)
+//     {
+//         sol.push_back(cur->state);
+//         cur = cur->parent;
+//     }
 
-    return sol;
-}
+//     return sol;
+// }
 
-// true if found goal, else false
-bool SearchAI::done()
-{
-    if (this->ai == ID_DFS)
-    {
-        return foundGoal || (this->CUR_MAX_DEPTH == this->MAX_DEPTH && this->open.isEmpty());
-    }
-    else
-    {
-        return foundGoal || this->open.isEmpty();
-    }
-}
+// // true if found goal, else false
+// bool SearchAI::done()
+// {
+//     if (this->ai == ID_DFS)
+//     {
+//         return foundGoal || (this->CUR_MAX_DEPTH == this->MAX_DEPTH && this->open.isEmpty());
+//     }
+//     else
+//     {
+//         return foundGoal || this->open.isEmpty();
+//     }
+// }
 
-StackOrQueue::StackOrQueue()
-    : isStack(true)
-{
-}
+// StackOrQueue::StackOrQueue()
+//     : isStack(true)
+// {
+// }
 
-StackOrQueue::StackOrQueue(bool isStack)
-    : isStack(isStack)
-{
-}
+// StackOrQueue::StackOrQueue(bool isStack)
+//     : isStack(isStack)
+// {
+// }
 
-Node* StackOrQueue::pop()
-{
-    Node* node;
-    if (this->isStack)
-    {
-        node = this->stack.top();
-        this->stack.pop();
-    }
-    else
-    {
-        node = this->queue.front();
-        this->queue.pop();
-    }
+// Node* StackOrQueue::pop()
+// {
+//     Node* node;
+//     if (this->isStack)
+//     {
+//         node = this->stack.top();
+//         this->stack.pop();
+//     }
+//     else
+//     {
+//         node = this->queue.front();
+//         this->queue.pop();
+//     }
 
-    return node;
-}
+//     return node;
+// }
 
-void StackOrQueue::push(Node* node)
-{
-    if (this->isStack)
-    {
-        this->stack.push(node);
-    }
-    else
-    {
-        this->queue.push(node);
-    }
-}
+// void StackOrQueue::push(Node* node)
+// {
+//     if (this->isStack)
+//     {
+//         this->stack.push(node);
+//     }
+//     else
+//     {
+//         this->queue.push(node);
+//     }
+// }
 
-bool StackOrQueue::isEmpty() const
-{
-    if (this->isStack)
-    {
-        return this->stack.size() == 0;
-    }
-    else
-    {
-        return this->queue.size() == 0;
-    }
-}
+// bool StackOrQueue::isEmpty() const
+// {
+//     if (this->isStack)
+//     {
+//         return this->stack.size() == 0;
+//     }
+//     else
+//     {
+//         return this->queue.size() == 0;
+//     }
+// }
 
-std::vector<GridCell> StackOrQueue::getGridCells()
-{
-    // Make copy of stack/queue
-    std::vector<Node*> copy;
-    while (!this->isEmpty())
-    {
-        copy.push_back(this->pop());
-    }
+// std::vector<GridCell> StackOrQueue::getGridCells()
+// {
+//     // Make copy of stack/queue
+//     std::vector<Node*> copy;
+//     while (!this->isEmpty())
+//     {
+//         copy.push_back(this->pop());
+//     }
 
-    // Create GridCell list
-    std::vector<GridCell> gridCells;
-    for (Node* n : copy)
-    {
-        gridCells.push_back(n->state);
-    }
+//     // Create GridCell list
+//     std::vector<GridCell> gridCells;
+//     for (Node* n : copy)
+//     {
+//         gridCells.push_back(n->state);
+//     }
 
-    // Restore stack/queue
-    if (this->isStack)
-    {
-        for (int i = copy.size() - 1; i > -1; i--)
-        {
-            this->push(copy[i]);
-        }
-    }
-    else
-    {
-        for (int i = 0; i < copy.size(); i++)
-        {
-            this->push(copy[i]);
-        }
-    }
+//     // Restore stack/queue
+//     if (this->isStack)
+//     {
+//         for (int i = copy.size() - 1; i > -1; i--)
+//         {
+//             this->push(copy[i]);
+//         }
+//     }
+//     else
+//     {
+//         for (int i = 0; i < copy.size(); i++)
+//         {
+//             this->push(copy[i]);
+//         }
+//     }
 
-    return gridCells;
-}
+//     return gridCells;
+// }
 
-unsigned int StackOrQueue::size()
-{
-    return (this->isStack ? this->stack.size() : this->queue.size());
-}
+// unsigned int StackOrQueue::size()
+// {
+//     return (this->isStack ? this->stack.size() : this->queue.size());
+// }
 
-std::vector<Node*> StackOrQueue::getNodes()
-{
-    // Make copy of stack/queue
-    std::vector<Node*> copy;
-    while (!this->isEmpty())
-    {
-        copy.push_back(this->pop());
-    }
+// std::vector<Node*> StackOrQueue::getNodes()
+// {
+//     // Make copy of stack/queue
+//     std::vector<Node*> copy;
+//     while (!this->isEmpty())
+//     {
+//         copy.push_back(this->pop());
+//     }
 
-    // Restore stack/queue
-    if (this->isStack)
-    {
-        for (int i = copy.size() - 1; i > -1; i--)
-        {
-            this->push(copy[i]);
-        }
-    }
-    else
-    {
-        for (int i = 0; i < copy.size(); i++)
-        {
-            this->push(copy[i]);
-        }
-    }
+//     // Restore stack/queue
+//     if (this->isStack)
+//     {
+//         for (int i = copy.size() - 1; i > -1; i--)
+//         {
+//             this->push(copy[i]);
+//         }
+//     }
+//     else
+//     {
+//         for (int i = 0; i < copy.size(); i++)
+//         {
+//             this->push(copy[i]);
+//         }
+//     }
 
-    return copy;
-}
+//     return copy;
+// }

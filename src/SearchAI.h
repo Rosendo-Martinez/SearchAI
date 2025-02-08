@@ -47,28 +47,46 @@ private:
 
 class SearchAI
 {
-private:
-    std::vector<Node*> closed;
-    StackOrQueue open;
-    GridCell start;
-    GridCell end;
-    Grid* grid;
-    Node* goal = nullptr;
-    bool foundGoal = false;
-    SearchAIType ai;
-    const unsigned int MAX_DEPTH = std::numeric_limits<unsigned int>::max();
-    unsigned int CUR_MAX_DEPTH = 0;
-    void expand(Node* node, Action act, const std::vector<Node*>& openVec);
+// private:
+//     std::vector<Node*> closed;
+//     StackOrQueue open;
+//     GridCell start;
+//     GridCell end;
+//     Grid* grid;
+//     Node* goal = nullptr;
+//     bool foundGoal = false;
+//     SearchAIType ai;
+//     const unsigned int MAX_DEPTH = std::numeric_limits<unsigned int>::max();
+//     unsigned int CUR_MAX_DEPTH = 0;
+//     void expand(Node* node, Action act, const std::vector<Node*>& openVec);
 
+// public:
+
+//     SearchAI() {}
+
+//     void init(GridCell start, GridCell end, Grid* grid, SearchAIType ai);
+//     void step();
+
+//     std::vector<GridCell> getOpen();
+//     std::vector<GridCell> getClosed();
+//     std::vector<GridCell> getSolution();
+//     bool done();
 public:
+    virtual bool done() = 0;
+    virtual void step() = 0;
+    virtual void finish() = 0;
+    virtual const std::vector<Node*> getOpen() = 0;
+    virtual const std::vector<Node*> getClosed() = 0;
+    virtual const std::vector<Node*> getSolution() = 0;
+    virtual ~SearchAI() {}
 
+protected:
     SearchAI() {}
 
-    void init(GridCell start, GridCell end, Grid* grid, SearchAIType ai);
-    void step();
+private:
 
-    std::vector<GridCell> getOpen();
-    std::vector<GridCell> getClosed();
-    std::vector<GridCell> getSolution();
-    bool done();
 };
+
+bool isLegalAction(const Grid* grid, GridCell state, Action act);
+GridCell doAction(GridCell state, Action act);
+Node expandHelper(Node* parent, Action act);
