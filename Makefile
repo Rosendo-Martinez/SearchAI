@@ -1,26 +1,39 @@
-./bin/main.exe : ./src/main.cpp ./bin/Shader.o ./bin/SquareRenderer.o ./bin/Grid.o ./src/GridRawData.h ./bin/LineRenderer.o ./bin/SearchAI.o ./bin/Renderer.o
-	g++ -o ./bin/main.exe ./src/main.cpp ./dep/glad/src/glad.c ./bin/Shader.o ./bin/SquareRenderer.o ./bin/Grid.o ./bin/LineRenderer.o ./bin/SearchAI.o ./bin/Renderer.o -I./dep/glad/include -lglfw -ldl
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -Wall -g -I./dep/glad/include
 
-run : ./bin/main.exe
-	./bin/main.exe
+# Target executable
+TARGET = ./bin/main.exe
 
-clean : 
-	rm ./bin/main.exe ./bin/*.o
+# Source and object files
+SRCS = $(wildcard ./src/*.cpp) ./dep/glad/src/glad.c
+OBJS = $(patsubst ./src/%.cpp, ./bin/%.o, $(filter-out ./src/main.cpp, $(wildcard ./src/*.cpp))) ./bin/glad.o
 
-./bin/Shader.o : ./src/Shader.cpp ./src/Shader.h
-	g++ -c ./src/Shader.cpp -o ./bin/Shader.o -I./dep/glad/include
+# Default target
+all: $(TARGET)
 
-./bin/SquareRenderer.o : ./src/SquareRenderer.cpp ./src/SquareRenderer.h
-	g++ -c ./src/SquareRenderer.cpp -o ./bin/SquareRenderer.o -I./dep/glad/include
+# Build the executable
+$(TARGET): ./bin/main.o $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $(TARGET) -lglfw -ldl
 
-./bin/Grid.o : ./src/Grid.cpp ./src/Grid.h
-	g++ -c ./src/Grid.cpp -o ./bin/Grid.o
+# Rule for object files
+./bin/%.o: ./src/%.cpp ./src/%.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-./bin/LineRenderer.o : ./src/LineRenderer.cpp ./src/LineRenderer.h
-	g++ -c ./src/LineRenderer.cpp -o ./bin/LineRenderer.o -I./dep/glad/include
+# Special Rules
+./bin/glad.o: ./dep/glad/src/glad.c
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-./bin/SearchAI.o : ./src/SearchAI.cpp ./src/SearchAI.h
-	g++ -c ./src/SearchAI.cpp -o ./bin/SearchAI.o
+./bin/main.o: ./src/main.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-./bin/Renderer.o : ./src/Renderer.cpp ./src/Renderer.h
-	g++ -c ./src/Renderer.cpp -o ./bin/Renderer.o
+# Run target
+run: $(TARGET)
+	$(TARGET)
+
+# Clean target
+clean:
+	rm -f $(TARGET) ./bin/*.o
+
+# Credit: Most of this was copied & pasted from ChatGPT.
+#		  I made some minor changes.
