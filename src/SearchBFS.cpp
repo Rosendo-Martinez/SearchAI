@@ -46,8 +46,6 @@ void SearchBFS::step()
         this->goal = current;
         return;
     }
-
-
 }
 
 void SearchBFS::expand(Node* node, Action act, std::vector<Node*>& openVec)
@@ -59,5 +57,26 @@ void SearchBFS::expand(Node* node, Action act, std::vector<Node*>& openVec)
 
     Node child = expandHelper(node, act);
 
-    
+    for (int i = 0; i < this->closed.size(); i++)
+    {
+        if (child.state == this->closed[i]->state)
+        {
+            return; // duplate state in closed list
+        }
+    }
+
+    for (Node* aNode : this->open.getNodes())
+    {
+        // TODO: could just add child to open list even if their is a duplicate
+        //       then skip expanding it since a duplicate would be guaranteed in the closed list.
+        //       Might be more efficient, but not 100% sure, just something to look into, later.
+
+        if (child.state == aNode->state)
+        {
+            return; // duplate state in open list
+        }
+    }
+
+    // Add child to open list
+    this->open.push(new Node(child));
 }
