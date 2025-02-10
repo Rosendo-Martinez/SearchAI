@@ -1,4 +1,5 @@
 #include "SearchAI.h"
+#include "StackOrQueue.h"
 
 class SearchBFS : public SearchAI
 {

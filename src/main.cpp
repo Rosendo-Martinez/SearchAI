@@ -7,6 +7,7 @@
 
 #include "GridRawData.h"
 #include "SearchAI.h"
+#include "SearchBFS.h"
 #include "Renderer.h"
 
 const glm::vec3 SOLUTION_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -21,7 +22,7 @@ glm::vec2 pathEnd;
 unsigned int selectedPathEndpoints = 0;
 
 bool reInitAI = true;
-SearchAI ai;
+SearchBFS* ai;
 SearchAIType aiType = BFS;
 
 float lastAnimation = 0.0f;
@@ -79,15 +80,16 @@ int main()
 
         if (!mapCreationMode)
         {
-            if (selectedPathEndpoints == 2 && !ai.done() && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
+            if (selectedPathEndpoints == 2 && (ai != nullptr && !ai->done()) && animate && currentFrame + ANIMATION_INTERVAL >= lastAnimation)
             {
-                ai.step();
+                ai->step();
                 lastAnimation = currentFrame;
             }
 
             if (reInitAI && selectedPathEndpoints == 2)
             {
-                ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, aiType);
+                // ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, aiType);
+                ai = new SearchBFS(&grid, getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
                 reInitAI = false;
             }
         }
@@ -99,22 +101,22 @@ int main()
         {
             renderer.drawGrid(grid);
 
-            if (selectedPathEndpoints == 2)
+            if (selectedPathEndpoints == 2 && ai != nullptr)
             {
-                std::vector<GridCell> closedList = ai.getClosed();
-                for (GridCell c : closedList)
+                std::vector<Node *> closedList = ai->getClosed();
+                for (const Node* aNode : closedList)
                 {
-                    renderer.drawCell(c, grid, CLOSED_CELL);
+                    renderer.drawCell(aNode->state, grid, CLOSED_CELL);
                 }
-                std::vector<GridCell> openList = ai.getOpen();
-                for (GridCell c : openList)
+                std::vector<Node*> openList = ai->getOpen();
+                for (Node* aNode : openList)
                 {
-                    renderer.drawCell(c, grid, OPEN_CELL);
+                    renderer.drawCell(aNode->state, grid, OPEN_CELL);
                 }
-                std::vector<GridCell> solution = ai.getSolution();
-                for (GridCell c : solution)
+                std::vector<Node*> solution = ai->getSolution();
+                for (Node* aNode : solution)
                 {
-                    renderer.drawCell(c, grid, SOLUTION_COLOR);
+                    renderer.drawCell(aNode->state, grid, SOLUTION_COLOR);
                 }
             }
 
@@ -266,14 +268,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             if (animate)
             {
                 float END_TIME = glfwGetTime() + 1.0f;
-                while (!ai.done() && END_TIME >= glfwGetTime())
+                while (!ai->done() && END_TIME >= glfwGetTime())
                 {
-                    ai.step();
+                    ai->step();
                 }
             }
             else
             {
-                ai.step();
+                ai->step();
             }
         }
     }
@@ -309,7 +311,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
         {
-            if (ai.done() && selectedPathEndpoints == 2)
+            if (ai->done() && selectedPathEndpoints == 2)
             {
                 reInitAI = true;
                 animate = true;
