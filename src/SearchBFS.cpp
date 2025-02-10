@@ -96,6 +96,8 @@ bool SearchBFS::done()
 
 void SearchBFS::finish()
 {
+    // TODO: test function to make sure its working.
+    
     while (!this->done())
     {
         this->step();
