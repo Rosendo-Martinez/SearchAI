@@ -9,6 +9,8 @@ SearchBFS::SearchBFS(const Grid* grid, GridCell start, GridCell end)
 
 SearchBFS::~SearchBFS()
 {
+    // TODO: test function to make sure its working.
+    
     for (Node* node : this->closed)
     {
         delete node;
