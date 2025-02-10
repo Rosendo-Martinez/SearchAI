@@ -42,7 +42,6 @@ void SearchBFS::step()
 
     if (this->end == current->state)
     {
-        this->foundGoal = true;
         this->goal = current;
         return;
     }
@@ -86,4 +85,10 @@ void SearchBFS::expand(Node* node, Action act)
 
     // Add child to open list
     this->open.push(new Node(child));
+}
+
+bool SearchBFS::done()
+{
+    // Done if found goal, or if no nodes left to expand.
+    return (this->goal != nullptr) || (this->open.size() == 0);
 }

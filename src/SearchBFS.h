@@ -21,7 +21,6 @@ private:
     std::vector<Node*> closed;
     const Grid* grid = nullptr;
     Node* goal = nullptr;
-    bool foundGoal = false;
 
     void init();
     void expand(Node* node, Action act);
