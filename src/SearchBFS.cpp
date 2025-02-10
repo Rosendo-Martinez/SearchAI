@@ -1,6 +1,5 @@
 #include "SearchBFS.h"
 
-// Note: I'm switching too one time use instances!
 
 SearchBFS::SearchBFS(const Grid* grid, GridCell start, GridCell end)
     : grid(grid), start(start), end(end), open(false), goal(nullptr)
@@ -91,4 +90,36 @@ bool SearchBFS::done()
 {
     // Done if found goal, or if no nodes left to expand.
     return (this->goal != nullptr) || (this->open.size() == 0);
+}
+
+void SearchBFS::finish()
+{
+    while (!this->done())
+    {
+        this->step();
+    }
+}
+
+const std::vector<Node*> SearchBFS::getOpen()
+{
+    return this->open.getNodes();
+}
+
+const std::vector<Node*> SearchBFS::getClosed()
+{
+    return this->closed;
+}
+
+const std::vector<Node*> SearchBFS::getSolution()
+{
+    std::vector<Node*> solution;
+
+    Node* current = this->goal;
+    while (current != nullptr)
+    {
+        solution.push_back(current);
+        current = current->parent;
+    }
+
+    return solution;
 }
