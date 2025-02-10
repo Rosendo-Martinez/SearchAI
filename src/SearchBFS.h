@@ -24,5 +24,5 @@ private:
     bool foundGoal = false;
 
     void init();
-    void expand(Node* node, Action act, std::vector<Node*>& openVec);
+    void expand(Node* node, Action act);
 };

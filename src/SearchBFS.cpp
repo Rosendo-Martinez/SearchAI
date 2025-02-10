@@ -46,9 +46,14 @@ void SearchBFS::step()
         this->goal = current;
         return;
     }
+
+    this->expand(current, UP);
+    this->expand(current, RIGHT);
+    this->expand(current, DOWN);
+    this->expand(current, LEFT);
 }
 
-void SearchBFS::expand(Node* node, Action act, std::vector<Node*>& openVec)
+void SearchBFS::expand(Node* node, Action act)
 {
     if (!isLegalAction(this->grid, node->state, act))
     {
@@ -65,6 +70,8 @@ void SearchBFS::expand(Node* node, Action act, std::vector<Node*>& openVec)
         }
     }
 
+    // Note: very inefficient to create a Node* vector list for every
+    //       expansion. But, for now its the simpler option.
     for (Node* aNode : this->open.getNodes())
     {
         // TODO: could just add child to open list even if their is a duplicate
