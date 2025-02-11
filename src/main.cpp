@@ -8,6 +8,7 @@
 #include "GridRawData.h"
 #include "SearchAI.h"
 #include "SearchBFS.h"
+#include "SearchDFS.h"
 #include "Renderer.h"
 
 const glm::vec3 SOLUTION_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -22,7 +23,7 @@ glm::vec2 pathEnd;
 unsigned int selectedPathEndpoints = 0;
 
 bool reInitAI = true;
-SearchBFS* ai;
+SearchDFS* ai;
 SearchAIType aiType = BFS;
 
 float lastAnimation = 0.0f;
@@ -89,7 +90,7 @@ int main()
             if (reInitAI && selectedPathEndpoints == 2)
             {
                 // ai.init(getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT), &grid, aiType);
-                ai = new SearchBFS(&grid, getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
+                ai = new SearchDFS(&grid, getCellThatMouseIsOn(grid, pathStart, SCR_WIDTH, SCR_HEIGHT), getCellThatMouseIsOn(grid, pathEnd, SCR_WIDTH, SCR_HEIGHT));
                 reInitAI = false;
             }
         }

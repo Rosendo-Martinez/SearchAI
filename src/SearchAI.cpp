@@ -72,6 +72,9 @@ Node expandHelper(Node* parent, Action act)
     return child;
 }
 
+/**
+ * Checks for out of bounds or moving from one cell to another cell with a different value.
+ */
 bool isLegalAction(const Grid* grid, GridCell state, Action act)
 {
     GridCell nextState = doAction(state, act);
