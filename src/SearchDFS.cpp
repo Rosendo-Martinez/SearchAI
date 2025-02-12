@@ -2,6 +2,16 @@
 #include <iostream>
 
 
+/**
+ * FAILURE! A node should be able to say, hey don't EVER look down here again. I know 100%
+ * the goal isn't down here so don't search down here again! This may help stop that flailing. But how?
+ * 
+ * Maybe children could pass up "FAILURE" to parent.
+ * The base case would be a child that did not spawn any children but could have gone deeper. 
+ * 
+ * If the faulres gets passed to all 4 sides of initial state, then we know it ain't possible to get to solution.
+ */
+
 SearchDFS::SearchDFS(const Grid* grid, GridCell start, GridCell end)
     : grid(grid), start(start), end(end)
 {
