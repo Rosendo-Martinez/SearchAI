@@ -6,6 +6,10 @@ AI search algorithms done so far:
 - DFS
 
 ## Demo
+### Version 2.0
+https://github.com/user-attachments/assets/d7d20747-421c-4166-8e47-f3cfa53fde2f
+
+### Version 1.0
 https://github.com/user-attachments/assets/0a102c24-72d9-48c7-b281-9a0f10f789cc
 
 ## Credit
