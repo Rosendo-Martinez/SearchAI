@@ -1,4 +1,5 @@
 #include "SearchDFS.h"
+#include <iostream>
 
 
 SearchDFS::SearchDFS(const Grid* grid, GridCell start, GridCell end)
@@ -13,6 +14,9 @@ SearchDFS::~SearchDFS()
 
 void SearchDFS::step()
 {
+    std::cout << "Before Step: \n";
+    std::cout << "    Open: " << this->open.size() << '\n';
+    std::cout << "    Closed: " << this->closed.size() << '\n';
     if (this->done())
     {
         return;
@@ -44,6 +48,10 @@ void SearchDFS::step()
     this->expand(toExplore, RIGHT);
     this->expand(toExplore, DOWN);
     this->expand(toExplore, LEFT);
+
+    // std::cout << "After Step: \n";
+    // std::cout << "    Open: " << this->open.size() << '\n';
+    // std::cout << "    Closed: " << this->closed.size() << '\n';
 }
 
 void SearchDFS::finish()
@@ -52,7 +60,7 @@ void SearchDFS::finish()
 
 bool SearchDFS::done()
 {
-    return this->open.size() == 0 || this->goal;
+    return this->open.size() == 0 || this->foundGoal;
 }
 
 const std::vector<Node*> SearchDFS::getOpen()
@@ -104,7 +112,7 @@ void SearchDFS::init()
  */
 void SearchDFS::expand(Node* node, Action act)
 {
-    bool isIllegalAction = isLegalAction(this->grid, node->state, act);
+    bool isIllegalAction = !isLegalAction(this->grid, node->state, act);
     if (isIllegalAction)
     {
         return;
