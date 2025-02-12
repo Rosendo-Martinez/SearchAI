@@ -1,11 +1,8 @@
 #include "SearchDFS.h"
 
-/**
- * TODO: 
- */
 
 SearchDFS::SearchDFS(const Grid* grid, GridCell start, GridCell end)
-    : grid(grid), start(start), end(end), goal(false)
+    : grid(grid), start(start), end(end)
 {
     this->init();
 }
@@ -21,27 +18,32 @@ void SearchDFS::step()
         return;
     }
 
-    NodeDFS* node = this->open[this->open.size() - 1]; // peek
-
-    if (node->state == this->end)
+    bool backTracking = (closed.size() != 0) && (closed.back()->depth >= open.back()->depth);
+    if (backTracking)
     {
-        this->goal = true;
+        Node* node = closed.back();
+        closed.pop_back();
+        delete node; 
+
         return;
     }
 
-    if ( // (short circuit)
-        this->expand(node, UP) || 
-        this->expand(node, RIGHT) || 
-        this->expand(node, DOWN) || 
-        this->expand(node, LEFT)
-    )
-    {
-        return;
-    }
-
-    // Dead end node, pop it
-    delete node;
+    Node* toExplore = this->open.back();
     this->open.pop_back();
+    this->closed.push_back(toExplore);
+
+    bool nodeIsAtGoal = toExplore->state == this->end;
+    if (nodeIsAtGoal)
+    {
+        this->goal = toExplore;
+        this->foundGoal = true;
+        return;
+    }
+
+    this->expand(toExplore, UP);
+    this->expand(toExplore, RIGHT);
+    this->expand(toExplore, DOWN);
+    this->expand(toExplore, LEFT);
 }
 
 void SearchDFS::finish()
@@ -66,85 +68,72 @@ const std::vector<Node*> SearchDFS::getOpen()
 
 const std::vector<Node*> SearchDFS::getClosed()
 {
-    std::vector<Node*> empty;
-    return empty;
+    std::vector<Node*> nodeVec(this->closed.size());
+    for (int i = 0; i < closed.size(); i++)
+    {
+        nodeVec[i] = (Node*) this->closed[i];
+    }
+
+    return nodeVec;
 }
 
 const std::vector<Node*> SearchDFS::getSolution()
 {
-    if (!goal)
+    if (!this->foundGoal)
     {
         std::vector<Node*> empty;
         return empty;
     }
     else
     {
-        return this->getOpen();
+        return this->closed;
     }
 }
 
 void SearchDFS::init()
 {
-    NodeDFS* initial = new NodeDFS;
+    Node* initial = new Node;
     initial->parent = nullptr;
     initial->state = this->start;
+    initial->depth = 0;
     this->open.push_back(initial);
 }
 
 /**
  * True if was able to expand node, else false.
  */
-bool SearchDFS::expand(NodeDFS* node, Action act)
+void SearchDFS::expand(Node* node, Action act)
 {
-    GridCell nextState = doAction(node->state, act);
-
-    bool alreadyExploredState = (node->SearchedUp && act == UP) || (node->SearchedRight && act == RIGHT) || (node->SearchedDown && act == DOWN) || (node->SearchedLeft && act == LEFT);
-    bool isIllegalAction = !isLegalAction(this->grid, node->state, act);
-    if (isIllegalAction || alreadyExploredState)
+    bool isIllegalAction = isLegalAction(this->grid, node->state, act);
+    if (isIllegalAction)
     {
-        return false;
+        return;
     }
 
-    // Prevent infinite loops
+    GridCell childState = doAction(node->state, act);
+
     for (int i = 0; i < this->open.size(); i++)
     {
-        bool isAlreadyOpenState = this->open[i]->state == nextState;
-        if (isAlreadyOpenState)
+        bool foundDuplicateState = childState == this->open[i]->state;
+        if (foundDuplicateState)
         {
-            return false;
+            return;
         }
     }
 
-    NodeDFS* child = new NodeDFS;
+    for (int i = 0; i < this->closed.size(); i++)
+    {
+        bool foundDuplicateState = childState == this->closed[i]->state;
+        if (foundDuplicateState)
+        {
+            return;
+        }
+    }
+
+    Node* child = new Node;
+    child->state = childState;
+    child->depth = node->depth + 1;
     child->parent = node;
-    child->state = nextState;
-    
-    // Note: Prevents backtracking of child onto parent. Technically not needed
-    //          since already taken care of by checking for duplicate state.
-    //          However, we know 100% that child should never back track on to
-    //          parent. So this will prevent 1/4 of O(n) checks on open list.
-    if (act == UP)
-    {
-        child->SearchedDown = true;
-        node->SearchedUp = true;
-    }
-    else if (act == RIGHT)
-    {
-        child->SearchedLeft = true;
-        node->SearchedRight = true;
-    }
-    else if (act == DOWN)
-    {
-        child->SearchedUp = true;
-        node->SearchedDown = true;
-    }
-    else // act == LEFT
-    {
-        child->SearchedRight = true;
-        node->SearchedLeft = true;
-    }
 
     this->open.push_back(child);
-
-    return true;
 }

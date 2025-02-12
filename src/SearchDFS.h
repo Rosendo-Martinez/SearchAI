@@ -1,13 +1,10 @@
 #include "SearchAI.h"
 #include <vector>
 
-struct NodeDFS : public Node
-{
-    bool SearchedUp = false;
-    bool SearchedRight = false;
-    bool SearchedDown = false;
-    bool SearchedLeft = false;
-};
+// struct NodeDFS : public Node
+// {
+//     int
+// };
 
 class SearchDFS : public SearchAI
 {
@@ -26,10 +23,13 @@ public:
 private:
     GridCell start;
     GridCell end;
-    std::vector<NodeDFS*> open; // stack
+    std::vector<Node*> open; // stack
+    std::vector<Node*> closed;
     const Grid* grid = nullptr;
-    bool goal = false;
+    Node* goal = nullptr;
+    bool foundGoal = false;
+
 
     void init();
-    bool expand(NodeDFS* node, Action act);
+    void expand(Node* node, Action act);
 };
