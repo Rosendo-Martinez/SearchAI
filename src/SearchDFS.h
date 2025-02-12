@@ -1,5 +1,6 @@
 #include "SearchAI.h"
 #include <vector>
+#include <limits>
 
 // struct NodeDFS : public Node
 // {
@@ -28,6 +29,8 @@ private:
     const Grid* grid = nullptr;
     Node* goal = nullptr;
     bool foundGoal = false;
+    const unsigned int MAX_DEPTH = std::numeric_limits<unsigned int>::max(); // exclusive
+    unsigned int CURRENT_MAX_DEPTH = 0; // exclusive
 
 
     void init();

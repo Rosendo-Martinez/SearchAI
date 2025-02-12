@@ -22,6 +22,19 @@ void SearchDFS::step()
         return;
     }
 
+    bool hitMaxDepth = (this->open.size() == 0);
+    if (hitMaxDepth)
+    {
+        for (int i = 0; i < this->closed.size(); i++)
+        {
+            delete closed[i];
+        }
+        closed.clear();
+
+        this->init();
+        return;
+    }
+
     bool backTracking = (closed.size() != 0) && (closed.back()->depth >= open.back()->depth);
     if (backTracking)
     {
@@ -60,7 +73,7 @@ void SearchDFS::finish()
 
 bool SearchDFS::done()
 {
-    return this->open.size() == 0 || this->foundGoal;
+    return (this->open.size() == 0 && this->CURRENT_MAX_DEPTH == this->MAX_DEPTH) || this->foundGoal;
 }
 
 const std::vector<Node*> SearchDFS::getOpen()
@@ -104,6 +117,7 @@ void SearchDFS::init()
     initial->parent = nullptr;
     initial->state = this->start;
     initial->depth = 0;
+    this->CURRENT_MAX_DEPTH++;
     this->open.push_back(initial);
 }
 
@@ -112,6 +126,12 @@ void SearchDFS::init()
  */
 void SearchDFS::expand(Node* node, Action act)
 {
+    bool childAtMaxDepth = node->depth + 1 == this->CURRENT_MAX_DEPTH;
+    if (childAtMaxDepth)
+    {
+        return;
+    }
+
     bool isIllegalAction = !isLegalAction(this->grid, node->state, act);
     if (isIllegalAction)
     {

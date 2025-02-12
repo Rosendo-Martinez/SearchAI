@@ -268,7 +268,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         {
             if (animate)
             {
-                float END_TIME = glfwGetTime() + 1.0f;
+                float END_TIME = glfwGetTime() + 5.0f;
                 while (!ai->done() && END_TIME >= glfwGetTime())
                 {
                     ai->step();
